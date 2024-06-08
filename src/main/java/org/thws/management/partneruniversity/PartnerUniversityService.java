@@ -17,7 +17,7 @@ public class PartnerUniversityService {
         this.partnerUniversityRepository = partnerUniversityRepository;
     }
 
-    public void addNewPartnerUniversity(PartnerUniversity partnerUniversity) {
+    public PartnerUniversity addNewPartnerUniversity(PartnerUniversity partnerUniversity) {
         Optional<PartnerUniversity> partnerUniversityOptional = partnerUniversityRepository
                 .findPartnerUniversityByName(partnerUniversity.getName());
 
@@ -25,7 +25,7 @@ public class PartnerUniversityService {
             throw new IllegalStateException("university already exists");
         }
 
-        partnerUniversityRepository.save(partnerUniversity);
+        return partnerUniversityRepository.save(partnerUniversity);
     }
 
     public void deletePartnerUniversity(Long partneruniversityId) {
@@ -38,7 +38,7 @@ public class PartnerUniversityService {
     }
 
     @Transactional
-    public void updatePartnerUniversity(Long partneruniversityId, PartnerUniversity updateRequest) {
+    public PartnerUniversity updatePartnerUniversity(Long partneruniversityId, PartnerUniversity updateRequest) {
         PartnerUniversity partnerUniversity = partnerUniversityRepository.findById(partneruniversityId)
                 .orElseThrow(() -> new IllegalStateException(
                         "university with id " + partneruniversityId + " does not exist"
@@ -76,7 +76,7 @@ public class PartnerUniversityService {
             partnerUniversity.setNextSummerSemester(updateRequest.getNextSummerSemester());
         }
 
-        partnerUniversityRepository.save(partnerUniversity);
+        return partnerUniversityRepository.save(partnerUniversity);
     }
 
     public PartnerUniversity getPartnerUniversityById(Long partneruniversityId) {
