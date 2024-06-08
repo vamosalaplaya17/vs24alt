@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,10 +15,6 @@ public class PartnerUniversityService {
     @Autowired
     public PartnerUniversityService(PartnerUniversityRepository partnerUniversityRepository) {
         this.partnerUniversityRepository = partnerUniversityRepository;
-    }
-
-    public List<PartnerUniversity> getPartnerUniversities() {
-        return partnerUniversityRepository.findAll();
     }
 
     public void addNewPartnerUniversity(PartnerUniversity partnerUniversity) {
@@ -93,5 +88,37 @@ public class PartnerUniversityService {
 
     public Page<PartnerUniversity> getAllPartnerUniversities(Pageable pageable) {
         return partnerUniversityRepository.findAll(pageable);
+    }
+
+    public Page<PartnerUniversity> getPartnerUniversitiesByName(String name, Pageable pageable) {
+        return partnerUniversityRepository.findByNameIgnoreCase(name, pageable);
+    }
+
+    public Page<PartnerUniversity> getPartnerUniversitiesByCountry(String country, Pageable pageable) {
+        return partnerUniversityRepository.findByCountryIgnoreCase(country, pageable);
+    }
+
+    public Page<PartnerUniversity> getPartnerUniversitiesByDepartmentName(String departmentName, Pageable pageable) {
+        return partnerUniversityRepository.findByDepartmentNameIgnoreCase(departmentName, pageable);
+    }
+
+    public Page<PartnerUniversity> getPartnerUniversitiesByNameAndCountryAndDepartmentName(
+            String name, String country, String departmentName, Pageable pageable) {
+        return partnerUniversityRepository.findByNameAndCountryAndDepartmentNameAllIgnoreCase(name, country, departmentName, pageable);
+    }
+
+    public Page<PartnerUniversity> getPartnerUniversitiesByNameAndCountry(
+            String name, String country, Pageable pageable) {
+        return partnerUniversityRepository.findByNameAndCountryAllIgnoreCase(name, country, pageable);
+    }
+
+    public Page<PartnerUniversity> getPartnerUniversitiesByNameAndDepartmentName(
+            String name, String departmentName, Pageable pageable) {
+        return partnerUniversityRepository.findByNameAndDepartmentNameAllIgnoreCase(name, departmentName, pageable);
+    }
+
+    public Page<PartnerUniversity> getPartnerUniversitiesByCountryAndDepartmentName(
+            String country, String departmentName, Pageable pageable) {
+        return partnerUniversityRepository.findByCountryAndDepartmentNameAllIgnoreCase(country, departmentName, pageable);
     }
 }
