@@ -47,12 +47,6 @@ public class PartnerUniversityModelAssembler extends RepresentationModelAssemble
         model.add(linkTo(methodOn(PartnerUniversityController.class)
                 .getPartnerUniversity(partnerUniversity.getId())).withSelfRel());
 
-        model.add(linkTo(methodOn(PartnerUniversityController.class)
-                .updatePartnerUniversity(partnerUniversity.getId(), null)).withRel("update").withType("PUT"));
-
-        model.add(linkTo(methodOn(PartnerUniversityController.class)
-                .deletePartnerUniversity(partnerUniversity.getId())).withRel("delete").withType("DELETE"));
-
         return model;
     }
 }

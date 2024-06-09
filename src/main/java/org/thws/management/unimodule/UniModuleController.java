@@ -96,8 +96,8 @@ public class UniModuleController {
 
     @GetMapping(path = "{uniModuleId}")
     public ResponseEntity<UniModuleModel> getUniModule(
-            @PathVariable("uniModuleId") Long uniModuleId,
-            @PathVariable("partnerUniversityId") Long partnerUniversityId) {
+            @PathVariable("partnerUniversityId") Long partnerUniversityId,
+            @PathVariable("uniModuleId") Long uniModuleId) {
 
         UniModule uniModule = uniModuleService.getUniModuleByPartnerUniversity(partnerUniversityId, uniModuleId);
 
