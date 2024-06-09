@@ -18,7 +18,9 @@ public interface PartnerUniversityRepository extends JpaRepository<PartnerUniver
     Page<PartnerUniversity> findAll(@NonNull Pageable pageable);
 
     Page<PartnerUniversity> findByNameIgnoreCase(String name, Pageable pageable);
+
     Page<PartnerUniversity> findByCountryIgnoreCase(String country, Pageable pageable);
+
     Page<PartnerUniversity> findByDepartmentNameIgnoreCase(String departmentName, Pageable pageable);
 
     Page<PartnerUniversity> findByNameAndCountryAndDepartmentNameAllIgnoreCase(String name, String country, String departmentName, Pageable pageable);

@@ -1,8 +1,10 @@
 package org.thws.management.partneruniversity;
 
 import jakarta.persistence.*;
+import org.thws.management.unimodule.UniModule;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table
@@ -28,6 +30,9 @@ public class PartnerUniversity {
     private Integer maxStudentsOut;
     private LocalDate nextSpringSemester;
     private LocalDate nextSummerSemester;
+
+    @OneToMany(mappedBy = "partnerUniversity", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UniModule> modules;
 
     public PartnerUniversity() {
     }
@@ -139,6 +144,14 @@ public class PartnerUniversity {
 
     public void setNextSummerSemester(LocalDate nextSummerSemester) {
         this.nextSummerSemester = nextSummerSemester;
+    }
+
+    public List<UniModule> getModules() {
+        return modules;
+    }
+
+    public void setModules(List<UniModule> modules) {
+        this.modules = modules;
     }
 
     @Override

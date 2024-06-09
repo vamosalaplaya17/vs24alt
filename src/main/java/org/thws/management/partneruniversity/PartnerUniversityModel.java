@@ -1,8 +1,10 @@
 package org.thws.management.partneruniversity;
 
 import org.springframework.hateoas.RepresentationModel;
+import org.thws.management.unimodule.UniModuleModel;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class PartnerUniversityModel extends RepresentationModel<PartnerUniversityModel> {
     private Long id;
@@ -15,6 +17,7 @@ public class PartnerUniversityModel extends RepresentationModel<PartnerUniversit
     private Integer maxStudentsOut;
     private LocalDate nextSpringSemester;
     private LocalDate nextSummerSemester;
+    private List<UniModuleModel> uniModuleModels;
 
     public PartnerUniversityModel() {
     }
@@ -110,5 +113,13 @@ public class PartnerUniversityModel extends RepresentationModel<PartnerUniversit
 
     public void setNextSummerSemester(LocalDate nextSummerSemester) {
         this.nextSummerSemester = nextSummerSemester;
+    }
+
+    public List<UniModuleModel> getUniModuleModels() {
+        return uniModuleModels;
+    }
+
+    public void setUniModuleModels(List<UniModuleModel> uniModules) {
+        this.uniModuleModels = uniModules;
     }
 }

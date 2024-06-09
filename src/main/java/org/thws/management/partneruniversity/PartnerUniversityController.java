@@ -86,55 +86,55 @@ public class PartnerUniversityController {
         return ResponseEntity.ok(pagedModel);
     }
 
-        @GetMapping(path = "{partneruniversityId}")
-        public ResponseEntity<PartnerUniversityModel> getPartnerUniversity (@PathVariable("partneruniversityId")Long
-        partnerUniversityId){
-            PartnerUniversity partnerUniversity = partnerUniversityService.getPartnerUniversityById(partnerUniversityId);
+    @GetMapping(path = "{partneruniversityId}")
+    public ResponseEntity<PartnerUniversityModel> getPartnerUniversity(@PathVariable("partneruniversityId") Long
+                                                                               partnerUniversityId) {
+        PartnerUniversity partnerUniversity = partnerUniversityService.getPartnerUniversityById(partnerUniversityId);
 
-            if (partnerUniversity == null) {
-                return ResponseEntity.notFound().build();
-            } else {
-                PartnerUniversityModel partnerUniversityModel = partnerUniversityModelAssembler.toModel(partnerUniversity);
+        if (partnerUniversity == null) {
+            return ResponseEntity.notFound().build();
+        } else {
+            PartnerUniversityModel partnerUniversityModel = partnerUniversityModelAssembler.toModel(partnerUniversity);
 
-                Link putLink = linkTo(methodOn(PartnerUniversityController.class)
-                        .updatePartnerUniversity(partnerUniversityId, null)).withRel("PUT");
-                Link deleteLink = linkTo(methodOn(PartnerUniversityController.class)
-                        .deletePartnerUniversity(partnerUniversityId)).withRel("DELETE");
+            Link putLink = linkTo(methodOn(PartnerUniversityController.class)
+                    .updatePartnerUniversity(partnerUniversityId, null)).withRel("PUT");
+            Link deleteLink = linkTo(methodOn(PartnerUniversityController.class)
+                    .deletePartnerUniversity(partnerUniversityId)).withRel("DELETE");
 
-                partnerUniversityModel.add(putLink);
-                partnerUniversityModel.add(deleteLink);
-
-                return ResponseEntity.ok(partnerUniversityModel);
-            }
-        }
-
-        @PostMapping
-        public ResponseEntity<PartnerUniversityModel> addNewPartnerUniversity (@RequestBody PartnerUniversity partnerUniversity) {
-            PartnerUniversity savedPartnerUniversity = partnerUniversityService.addNewPartnerUniversity(partnerUniversity);
-            PartnerUniversityModel partnerUniversityModel = partnerUniversityModelAssembler.toModel(savedPartnerUniversity);
-
-            return ResponseEntity
-                    .created(linkTo(
-                            methodOn(PartnerUniversityController.class)
-                                    .getPartnerUniversity(savedPartnerUniversity.getId()))
-                            .toUri())
-                    .body(partnerUniversityModel);
-        }
-
-        @DeleteMapping(path = "{partneruniversityId}")
-        public ResponseEntity<Void> deletePartnerUniversity (@PathVariable("partneruniversityId") Long partneruniversityId){
-            partnerUniversityService.deletePartnerUniversity(partneruniversityId);
-            return ResponseEntity.noContent().build();
-        }
-
-        @PutMapping(path = "{partneruniversityId}")
-        public ResponseEntity<PartnerUniversityModel> updatePartnerUniversity (
-                @PathVariable("partneruniversityId") Long partneruniversityId,
-                @RequestBody PartnerUniversity partnerUniversity){
-
-            PartnerUniversity updatePartnerUniversity = partnerUniversityService.updatePartnerUniversity(partneruniversityId, partnerUniversity);
-            PartnerUniversityModel partnerUniversityModel = partnerUniversityModelAssembler.toModel(updatePartnerUniversity);
+            partnerUniversityModel.add(putLink);
+            partnerUniversityModel.add(deleteLink);
 
             return ResponseEntity.ok(partnerUniversityModel);
         }
     }
+
+    @PostMapping
+    public ResponseEntity<PartnerUniversityModel> addNewPartnerUniversity(@RequestBody PartnerUniversity partnerUniversity) {
+        PartnerUniversity savedPartnerUniversity = partnerUniversityService.addNewPartnerUniversity(partnerUniversity);
+        PartnerUniversityModel partnerUniversityModel = partnerUniversityModelAssembler.toModel(savedPartnerUniversity);
+
+        return ResponseEntity
+                .created(linkTo(
+                        methodOn(PartnerUniversityController.class)
+                                .getPartnerUniversity(savedPartnerUniversity.getId()))
+                        .toUri())
+                .body(partnerUniversityModel);
+    }
+
+    @DeleteMapping(path = "{partneruniversityId}")
+    public ResponseEntity<Void> deletePartnerUniversity(@PathVariable("partneruniversityId") Long partneruniversityId) {
+        partnerUniversityService.deletePartnerUniversity(partneruniversityId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping(path = "{partneruniversityId}")
+    public ResponseEntity<PartnerUniversityModel> updatePartnerUniversity(
+            @PathVariable("partneruniversityId") Long partneruniversityId,
+            @RequestBody PartnerUniversity partnerUniversity) {
+
+        PartnerUniversity updatePartnerUniversity = partnerUniversityService.updatePartnerUniversity(partneruniversityId, partnerUniversity);
+        PartnerUniversityModel partnerUniversityModel = partnerUniversityModelAssembler.toModel(updatePartnerUniversity);
+
+        return ResponseEntity.ok(partnerUniversityModel);
+    }
+}
