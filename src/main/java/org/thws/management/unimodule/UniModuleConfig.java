@@ -1,8 +1,10 @@
 package org.thws.management.unimodule;
 
+import jakarta.transaction.Transactional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.thws.management.partneruniversity.PartnerUniversity;
 import org.thws.management.partneruniversity.PartnerUniversityRepository;
 
@@ -12,6 +14,8 @@ import java.util.List;
 public class UniModuleConfig {
 
     @Bean
+    @Order(2)
+    @Transactional
     public CommandLineRunner uniModuleCommandLineRunner(PartnerUniversityRepository partnerUniversityRepository, UniModuleRepository uniModuleRepository) {
         return args -> {
             PartnerUniversity thws = partnerUniversityRepository.findById(1L).orElse(null);

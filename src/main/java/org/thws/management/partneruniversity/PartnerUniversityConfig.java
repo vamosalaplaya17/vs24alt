@@ -1,8 +1,10 @@
 package org.thws.management.partneruniversity;
 
+import jakarta.transaction.Transactional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 import java.time.LocalDate;
 import java.time.Month;
@@ -13,7 +15,6 @@ public class PartnerUniversityConfig {
     @Bean
     public PartnerUniversity thws() {
         return new PartnerUniversity(
-                1L,
                 "THWS",
                 "Germany",
                 "Department Name 1",
@@ -42,9 +43,9 @@ public class PartnerUniversityConfig {
     }
 
     @Bean
+    @Order(1)
+    @Transactional
     public CommandLineRunner commandLineRunner(PartnerUniversityRepository partnerUniversityRepository) {
-        return args -> {
-            partnerUniversityRepository.saveAll(List.of(thws(), otherUniversity()));
-        };
+        return args -> partnerUniversityRepository.saveAll(List.of(thws(), otherUniversity()));
     }
 }
