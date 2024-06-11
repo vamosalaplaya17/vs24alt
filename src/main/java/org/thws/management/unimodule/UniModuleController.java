@@ -69,7 +69,7 @@ public class UniModuleController {
     }
 
     /**
-     * Gets all UniModules, divided in pages
+     * Gets all UniModules, divided in pages, and creates related links
      * Potentially filtered by any combination of name, semester and ects
      *
      * @param partnerUniversityId ID of PartnerUniversity to retrieve UniModules from
@@ -92,6 +92,7 @@ public class UniModuleController {
 
         Page<UniModule> uniModules;
         Pageable pageable = PageRequest.of(page, size);
+
         if (name != null || semester != null || ects != null) {
             uniModules = uniModuleService.getAllUniModulesByPartnerUniversityWithFilters(
                     partnerUniversityId, name, semester, ects, pageable);
@@ -116,7 +117,7 @@ public class UniModuleController {
 
         PagedModel<UniModuleModel> pagedModel = PagedModel.of(uniModuleModels, pageMetadata);
 
-        Link selfLink = linkTo(methodOn(UniModuleController.class).addNewUniModule(partnerUniversityId, null))
+        Link selfLink = linkTo(methodOn(UniModuleController.class).getAllUniModules(partnerUniversityId, name, semester, ects, page, size))
                 .withSelfRel().withType("GET");
 
         Link postLink = linkTo(methodOn(UniModuleController.class).addNewUniModule(partnerUniversityId, null))
@@ -154,7 +155,7 @@ public class UniModuleController {
      * @return ResponseEntity of updated UniModule
      */
     @PutMapping(path = "{uniModuleId}")
-    public ResponseEntity<UniModuleModel> updateUniModel(
+    public ResponseEntity<UniModuleModel> updateUniModule(
             @PathVariable("partnerUniversityId") Long partnerUniversityId,
             @PathVariable("uniModuleId") Long uniModuleId,
             @RequestBody UniModule uniModule) {

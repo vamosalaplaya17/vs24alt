@@ -8,7 +8,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
- * Assembler class, to convert UniModules into their UniModuleModel representation
+ * Assembler class, to convert UniModules into their model representation, named UniModuleModel
  */
 @Component
 public class UniModuleModelAssembler extends RepresentationModelAssemblerSupport<UniModule, UniModuleModel> {
@@ -37,7 +37,7 @@ public class UniModuleModelAssembler extends RepresentationModelAssemblerSupport
         model.setEcts(uniModule.getEcts());
 
         model.add(linkTo(methodOn(UniModuleController.class).getUniModule(uniModule.getPartnerUniversity().getId(), uniModule.getId())).withSelfRel().withType("GET"));
-        model.add(linkTo(methodOn(UniModuleController.class).updateUniModel(uniModule.getPartnerUniversity().getId(), uniModule.getId(), null)).withRel("update").withType("PUT"));
+        model.add(linkTo(methodOn(UniModuleController.class).updateUniModule(uniModule.getPartnerUniversity().getId(), uniModule.getId(), null)).withRel("update").withType("PUT"));
         model.add(linkTo(methodOn(UniModuleController.class).deleteUniModule(uniModule.getPartnerUniversity().getId(), uniModule.getId())).withRel("delete").withType("DELETE"));
 
         return model;

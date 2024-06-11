@@ -6,6 +6,9 @@ import org.thws.management.unimodule.UniModuleModel;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Representation model for a UniModule, containing only the basic information
+ */
 public class PartnerUniversityModel extends RepresentationModel<PartnerUniversityModel> {
     private Long id;
     private String name;
@@ -20,19 +23,6 @@ public class PartnerUniversityModel extends RepresentationModel<PartnerUniversit
     private List<UniModuleModel> uniModuleModels;
 
     public PartnerUniversityModel() {
-    }
-
-    public PartnerUniversityModel(Long id, String name, String country, String departmentName, String departmentUrl, String contactPerson, Integer maxStudentsIn, Integer maxStudentsOut, LocalDate nextSpringSemester, LocalDate nextSummerSemester) {
-        this.id = id;
-        this.name = name;
-        this.country = country;
-        this.departmentName = departmentName;
-        this.departmentUrl = departmentUrl;
-        this.contactPerson = contactPerson;
-        this.maxStudentsIn = maxStudentsIn;
-        this.maxStudentsOut = maxStudentsOut;
-        this.nextSpringSemester = nextSpringSemester;
-        this.nextSummerSemester = nextSummerSemester;
     }
 
     public Long getId() {

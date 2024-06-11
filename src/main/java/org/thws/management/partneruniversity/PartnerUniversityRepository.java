@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * PartnerUniversity repository, to interact with the database and retrieve information
+ */
 @Repository
 public interface PartnerUniversityRepository extends JpaRepository<PartnerUniversity, Long>, PagingAndSortingRepository<PartnerUniversity, Long> {
     Optional<PartnerUniversity> findPartnerUniversityByName(String name);
@@ -17,12 +20,7 @@ public interface PartnerUniversityRepository extends JpaRepository<PartnerUniver
     @NonNull
     Page<PartnerUniversity> findAll(@NonNull Pageable pageable);
 
-    Page<PartnerUniversity> findByNameIgnoreCase(String name, Pageable pageable);
-
-    Page<PartnerUniversity> findByCountryIgnoreCase(String country, Pageable pageable);
-
-    Page<PartnerUniversity> findByDepartmentNameIgnoreCase(String departmentName, Pageable pageable);
-
+    //the following are responsible for filtering
     Page<PartnerUniversity> findByNameAndCountryAndDepartmentNameAllIgnoreCase(String name, String country, String departmentName, Pageable pageable);
 
     Page<PartnerUniversity> findByNameAndCountryAllIgnoreCase(String name, String country, Pageable pageable);
@@ -30,4 +28,10 @@ public interface PartnerUniversityRepository extends JpaRepository<PartnerUniver
     Page<PartnerUniversity> findByNameAndDepartmentNameAllIgnoreCase(String name, String departmentName, Pageable pageable);
 
     Page<PartnerUniversity> findByCountryAndDepartmentNameAllIgnoreCase(String country, String departmentName, Pageable pageable);
+
+    Page<PartnerUniversity> findByNameIgnoreCase(String name, Pageable pageable);
+
+    Page<PartnerUniversity> findByCountryIgnoreCase(String country, Pageable pageable);
+
+    Page<PartnerUniversity> findByDepartmentNameIgnoreCase(String departmentName, Pageable pageable);
 }

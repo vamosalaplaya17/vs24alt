@@ -3,13 +3,16 @@ package org.thws.management.unimodule;
 import org.springframework.hateoas.RepresentationModel;
 
 /**
- * Representation model for a UniModule, containing basic information
+ * Representation model for a UniModule, containing only the basic information
  */
 public class UniModuleModel extends RepresentationModel<UniModuleModel> {
     private Long id;
     private String name;
     private Integer semester;
     private Integer ects;
+
+    public UniModuleModel() {
+    }
 
     public Long getId() {
         return id;

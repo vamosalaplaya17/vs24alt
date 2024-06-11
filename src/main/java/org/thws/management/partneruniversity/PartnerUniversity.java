@@ -6,6 +6,9 @@ import org.thws.management.unimodule.UniModule;
 import java.time.LocalDate;
 import java.util.List;
 
+/**
+ * Represents a university, called PartnerUniversity
+ */
 @Entity
 public class PartnerUniversity {
     @Id
@@ -33,24 +36,25 @@ public class PartnerUniversity {
     @OneToMany(mappedBy = "partnerUniversity", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UniModule> modules;
 
+    /**
+     * To make JPA happy
+     */
     public PartnerUniversity() {
     }
 
-    public PartnerUniversity(Long id, String name, String country, String departmentName, String departmentUrl,
-                             String contactPerson, Integer maxStudentsIn, Integer maxStudentsOut,
-                             LocalDate nextSpringSemester, LocalDate nextSummerSemester) {
-        this.id = id;
-        this.name = name;
-        this.country = country;
-        this.departmentName = departmentName;
-        this.departmentUrl = departmentUrl;
-        this.contactPerson = contactPerson;
-        this.maxStudentsIn = maxStudentsIn;
-        this.maxStudentsOut = maxStudentsOut;
-        this.nextSpringSemester = nextSpringSemester;
-        this.nextSummerSemester = nextSummerSemester;
-    }
-
+    /**
+     * Constructs a new PartnerUniversity
+     *
+     * @param name               Name of PartnerUniversity
+     * @param country            Country of PartnerUniversity
+     * @param departmentName     Department Name of PartnerUniversity
+     * @param departmentUrl      URL of department of PartnerUniversity
+     * @param contactPerson      Contact person at PartnerUniversity
+     * @param maxStudentsIn      Maximum number of students allowed from other university
+     * @param maxStudentsOut     Maximum number of students allowed to send to other university
+     * @param nextSpringSemester Start date of next spring semester
+     * @param nextSummerSemester Start date of next summer semester
+     */
     public PartnerUniversity(String name, String country, String departmentName, String departmentUrl,
                              String contactPerson, Integer maxStudentsIn, Integer maxStudentsOut,
                              LocalDate nextSpringSemester, LocalDate nextSummerSemester) {
@@ -65,6 +69,7 @@ public class PartnerUniversity {
         this.nextSummerSemester = nextSummerSemester;
     }
 
+    //Getters and setters
     public Long getId() {
         return id;
     }
@@ -151,21 +156,5 @@ public class PartnerUniversity {
 
     public void setModules(List<UniModule> modules) {
         this.modules = modules;
-    }
-
-    @Override
-    public String toString() {
-        return "PartnerUniversity{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", country='" + country + '\'' +
-                ", departmentName='" + departmentName + '\'' +
-                ", departmentUrl='" + departmentUrl + '\'' +
-                ", contactPerson='" + contactPerson + '\'' +
-                ", maxStudentsIn=" + maxStudentsIn +
-                ", maxStudentsOut=" + maxStudentsOut +
-                ", nextSpringSemester=" + nextSpringSemester +
-                ", nextSummerSemester=" + nextSummerSemester +
-                '}';
     }
 }

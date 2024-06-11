@@ -10,6 +10,9 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.util.List;
 
+/**
+ * Class for initializing a PartnerUniversities at startup, so there is something to work with
+ */
 @Configuration
 public class PartnerUniversityConfig {
     @Bean
@@ -42,6 +45,12 @@ public class PartnerUniversityConfig {
         );
     }
 
+    /**
+     * CommandLineRunner initializes standard PartnerUniversity data in the database
+     *
+     * @param partnerUniversityRepository Repository of the PartnerUniversities
+     * @return Initialized PartnerUniversity data
+     */
     @Bean
     @Order(1)
     @Transactional
