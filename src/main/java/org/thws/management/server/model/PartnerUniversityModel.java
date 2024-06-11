@@ -1,7 +1,6 @@
-package org.thws.management.partneruniversity;
+package org.thws.management.server.model;
 
 import org.springframework.hateoas.RepresentationModel;
-import org.thws.management.unimodule.UniModuleModel;
 
 import java.time.LocalDate;
 import java.util.List;

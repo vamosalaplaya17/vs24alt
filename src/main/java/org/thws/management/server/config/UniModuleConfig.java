@@ -1,12 +1,14 @@
-package org.thws.management.unimodule;
+package org.thws.management.server.config;
 
 import jakarta.transaction.Transactional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
-import org.thws.management.partneruniversity.PartnerUniversity;
-import org.thws.management.partneruniversity.PartnerUniversityRepository;
+import org.thws.management.server.model.PartnerUniversity;
+import org.thws.management.server.repository.PartnerUniversityRepository;
+import org.thws.management.server.model.UniModule;
+import org.thws.management.server.repository.UniModuleRepository;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package org.thws.management.partneruniversity;
+package org.thws.management.server.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -10,6 +10,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.thws.management.server.model.PartnerUniversity;
+import org.thws.management.server.model.PartnerUniversityModel;
+import org.thws.management.server.assembler.PartnerUniversityModelAssembler;
+import org.thws.management.server.service.PartnerUniversityService;
 
 import java.util.List;
 

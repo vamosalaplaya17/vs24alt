@@ -1,7 +1,6 @@
-package org.thws.management.unimodule;
+package org.thws.management.server.model;
 
 import jakarta.persistence.*;
-import org.thws.management.partneruniversity.PartnerUniversity;
 
 /**
  * Represents a university module, called UniModule

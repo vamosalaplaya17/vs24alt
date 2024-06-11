@@ -1,4 +1,4 @@
-package org.thws.management.partneruniversity;
+package org.thws.management.server.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.thws.management.server.model.PartnerUniversity;
+import org.thws.management.server.repository.PartnerUniversityRepository;
 
 /**
  * Service class for managing PartnerUniversities

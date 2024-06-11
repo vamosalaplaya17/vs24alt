@@ -1,4 +1,4 @@
-package org.thws.management.unimodule;
+package org.thws.management.server.model;
 
 import org.springframework.hateoas.RepresentationModel;
 

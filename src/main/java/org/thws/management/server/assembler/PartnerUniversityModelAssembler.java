@@ -1,11 +1,13 @@
-package org.thws.management.partneruniversity;
+package org.thws.management.server.assembler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.server.mvc.RepresentationModelAssemblerSupport;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import org.thws.management.unimodule.UniModuleModel;
-import org.thws.management.unimodule.UniModuleModelAssembler;
+import org.thws.management.server.controller.PartnerUniversityController;
+import org.thws.management.server.model.PartnerUniversity;
+import org.thws.management.server.model.PartnerUniversityModel;
+import org.thws.management.server.model.UniModuleModel;
 
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,7 +1,6 @@
-package org.thws.management.partneruniversity;
+package org.thws.management.server.model;
 
 import jakarta.persistence.*;
-import org.thws.management.unimodule.UniModule;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -1,4 +1,4 @@
-package org.thws.management.partneruniversity;
+package org.thws.management.server.repository;
 
 
 import org.springframework.data.domain.Page;
@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
+import org.thws.management.server.model.PartnerUniversity;
 
 import java.util.Optional;
 

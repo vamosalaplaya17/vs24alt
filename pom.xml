@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.thws</groupId>
-    <artifactId>management</artifactId>
+    <artifactId>vs24alt</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>management</name>
     <description>management</description>

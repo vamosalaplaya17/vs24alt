@@ -1,10 +1,12 @@
-package org.thws.management.partneruniversity;
+package org.thws.management.server.config;
 
 import jakarta.transaction.Transactional;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.thws.management.server.model.PartnerUniversity;
+import org.thws.management.server.repository.PartnerUniversityRepository;
 
 import java.time.LocalDate;
 import java.time.Month;
