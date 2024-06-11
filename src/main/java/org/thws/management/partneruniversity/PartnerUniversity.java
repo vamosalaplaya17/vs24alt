@@ -7,17 +7,16 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table
 public class PartnerUniversity {
     @Id
     @SequenceGenerator(
-            name = "partneruniversity_sequence",
-            sequenceName = "partneruniversity_sequence",
+            name = "partnerUniversity_sequence",
+            sequenceName = "partnerUniversity_sequence",
             allocationSize = 1
     )
     @GeneratedValue(
             strategy = GenerationType.SEQUENCE,
-            generator = "partneruniversity_sequence"
+            generator = "partnerUniversity_sequence"
     )
     private Long id;
 

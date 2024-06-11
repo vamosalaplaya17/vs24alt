@@ -3,8 +3,10 @@ package org.thws.management.unimodule;
 import jakarta.persistence.*;
 import org.thws.management.partneruniversity.PartnerUniversity;
 
+/**
+ * Represents a university module, called UniModule
+ */
 @Entity
-@Table(name = "uni_modules")
 public class UniModule {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "unimodule_sequence")
@@ -16,12 +18,22 @@ public class UniModule {
     private Integer ects;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "partner_university_id")
     private PartnerUniversity partnerUniversity;
 
+    /**
+     * To make JPA happy
+     */
     public UniModule() {
     }
 
+    /**
+     * Constructs a new UniModule
+     *
+     * @param name Name of the UniModule
+     * @param semester Semester, in which UniModule takes place
+     * @param ects Credits of UniModule
+     * @param partnerUniversity Associated PartnerUniversity with UniModule
+     */
     public UniModule(String name, int semester, int ects, PartnerUniversity partnerUniversity) {
         this.name = name;
         this.semester = semester;
@@ -29,14 +41,7 @@ public class UniModule {
         this.partnerUniversity = partnerUniversity;
     }
 
-    public UniModule(Long id, String name, Integer semester, Integer ects, PartnerUniversity partnerUniversity) {
-        this.id = id;
-        this.name = name;
-        this.semester = semester;
-        this.ects = ects;
-        this.partnerUniversity = partnerUniversity;
-    }
-
+    //Getters and setters
     public Long getId() {
         return id;
     }

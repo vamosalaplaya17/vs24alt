@@ -39,10 +39,12 @@ public class PartnerUniversityModelAssembler extends RepresentationModelAssemble
         model.setNextSpringSemester(partnerUniversity.getNextSpringSemester());
         model.setNextSummerSemester(partnerUniversity.getNextSummerSemester());
 
-        List<UniModuleModel> uniModuleModels = partnerUniversity.getModules().stream()
-                .map(uniModuleModelAssembler::toModel)
-                .collect(Collectors.toList());
-        model.setUniModuleModels(uniModuleModels);
+        if (partnerUniversity.getModules() != null) {
+            List<UniModuleModel> uniModuleModels = partnerUniversity.getModules().stream()
+                    .map(uniModuleModelAssembler::toModel)
+                    .collect(Collectors.toList());
+            model.setUniModuleModels(uniModuleModels);
+        }
 
         model.add(linkTo(methodOn(PartnerUniversityController.class)
                 .getPartnerUniversity(partnerUniversity.getId())).withSelfRel());

@@ -10,9 +10,19 @@ import org.thws.management.partneruniversity.PartnerUniversityRepository;
 
 import java.util.List;
 
+/**
+ * Class for initializing a couple UniModules at startup, so there is something to work with
+ */
 @Configuration
 public class UniModuleConfig {
 
+    /**
+     * CommandLineRunner initializes standard UniModule data in the database
+     *
+     * @param partnerUniversityRepository Repository of the PartnerUniversities
+     * @param uniModuleRepository Repository of the UniModules
+     * @return Initialized UniModule data
+     */
     @Bean
     @Order(2)
     @Transactional

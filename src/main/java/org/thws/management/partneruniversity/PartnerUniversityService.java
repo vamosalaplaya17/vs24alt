@@ -4,7 +4,9 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -22,26 +24,28 @@ public class PartnerUniversityService {
                 .findPartnerUniversityByName(partnerUniversity.getName());
 
         if (partnerUniversityOptional.isPresent()) {
-            throw new IllegalStateException("university already exists");
+            throw new ResponseStatusException(HttpStatus.SEE_OTHER,
+                    "university already exists");
         }
 
         return partnerUniversityRepository.save(partnerUniversity);
     }
 
-    public void deletePartnerUniversity(Long partneruniversityId) {
-        boolean exists = partnerUniversityRepository.existsById(partneruniversityId);
+    public void deletePartnerUniversity(Long partnerUniversityId) {
+        boolean exists = partnerUniversityRepository.existsById(partnerUniversityId);
         if (!exists) {
-            throw new IllegalStateException("university with id " + partneruniversityId + " does not exist");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "university with id " + partnerUniversityId + " does not exist");
         }
 
-        partnerUniversityRepository.deleteById(partneruniversityId);
+        partnerUniversityRepository.deleteById(partnerUniversityId);
     }
 
     @Transactional
-    public PartnerUniversity updatePartnerUniversity(Long partneruniversityId, PartnerUniversity updateRequest) {
-        PartnerUniversity partnerUniversity = partnerUniversityRepository.findById(partneruniversityId)
-                .orElseThrow(() -> new IllegalStateException(
-                        "university with id " + partneruniversityId + " does not exist"
+    public PartnerUniversity updatePartnerUniversity(Long partnerUniversityId, PartnerUniversity updateRequest) {
+        PartnerUniversity partnerUniversity = partnerUniversityRepository.findById(partnerUniversityId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "university with id " + partnerUniversityId + " does not exist"
                 ));
 
         if (updateRequest.getName() != null && !updateRequest.getName().isEmpty()) {
@@ -79,10 +83,10 @@ public class PartnerUniversityService {
         return partnerUniversityRepository.save(partnerUniversity);
     }
 
-    public PartnerUniversity getPartnerUniversityById(Long partneruniversityId) {
-        return partnerUniversityRepository.findById(partneruniversityId)
-                .orElseThrow(() -> new IllegalStateException(
-                        "university with id " + partneruniversityId + " does not exist"
+    public PartnerUniversity getPartnerUniversityById(Long partnerUniversityId) {
+        return partnerUniversityRepository.findById(partnerUniversityId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "university with id " + partnerUniversityId + " does not exist"
                 ));
     }
 

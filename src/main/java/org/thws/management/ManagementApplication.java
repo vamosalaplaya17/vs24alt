@@ -4,6 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+/**
+ * Responsible for starting the management system
+ */
 @SpringBootApplication(scanBasePackages = "org.thws.management")
 @EnableJpaRepositories
 public class ManagementApplication {
