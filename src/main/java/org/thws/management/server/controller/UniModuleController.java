@@ -58,8 +58,12 @@ public class UniModuleController {
     @PostMapping
     public ResponseEntity<UniModuleModel> addNewUniModule(@PathVariable Long partnerUniversityId,
                                                           @RequestBody UniModule uniModule) {
-        PartnerUniversity partnerUniversity = partnerUniversityService.getPartnerUniversityById(partnerUniversityId);
-        uniModule.setPartnerUniversity(partnerUniversity);
+        if (partnerUniversityService.getPartnerUniversityById(partnerUniversityId) == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (uniModule == null) {
+            return ResponseEntity.badRequest().build();
+        }
 
         UniModule savedUniModule = uniModuleService.addNewUniModule(partnerUniversityId, uniModule);
         UniModuleModel uniModuleModel = uniModuleModelAssembler.toModel(savedUniModule);
@@ -92,7 +96,7 @@ public class UniModuleController {
             @RequestParam(required = false) Integer semester,
             @RequestParam(required = false) Integer ects,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "2") int size) {
+            @RequestParam(defaultValue = "3") int size) {
 
         Page<UniModule> uniModules;
         Pageable pageable = PageRequest.of(page, size);
@@ -144,6 +148,15 @@ public class UniModuleController {
     public ResponseEntity<UniModuleModel> getUniModule(
             @PathVariable("partnerUniversityId") Long partnerUniversityId,
             @PathVariable("uniModuleId") Long uniModuleId) {
+        if (partnerUniversityService.getPartnerUniversityById(partnerUniversityId) == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (uniModuleService.getUniModuleById(uniModuleId) == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (uniModuleService.getUniModuleByPartnerUniversity(partnerUniversityId, uniModuleId) == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         UniModule uniModule = uniModuleService.getUniModuleByPartnerUniversity(partnerUniversityId, uniModuleId);
         UniModuleModel uniModuleModel = uniModuleModelAssembler.toModel(uniModule);
@@ -178,7 +191,14 @@ public class UniModuleController {
     @DeleteMapping(path = "{uniModuleId}")
     public ResponseEntity<Void> deleteUniModule(@PathVariable("partnerUniversityId") Long partnerUniversityId,
                                                 @PathVariable("uniModuleId") Long uniModuleId) {
-        uniModuleService.deleteUniModuleByPartnerUniversity(partnerUniversityId, uniModuleId);
+        if (partnerUniversityService.getPartnerUniversityById(partnerUniversityId) == null) {
+            ResponseEntity.notFound().build();
+        }
+        if (uniModuleService.getUniModuleByPartnerUniversity(partnerUniversityId, uniModuleId) == null) {
+            ResponseEntity.notFound().build();
+        }
+
+        uniModuleService.deleteUniModuleByPartnerUniversity(uniModuleId);
         return ResponseEntity.noContent().build();
     }
 }

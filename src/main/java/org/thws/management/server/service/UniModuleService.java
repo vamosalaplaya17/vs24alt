@@ -155,17 +155,10 @@ public class UniModuleService {
     /**
      * Deletes one specific UniModule
      *
-     * @param partnerUniversityId ID of PartnerUniversity to delete UniModule from
      * @param uniModuleId         ID of UniModule to delete
      * @throws ResponseStatusException If UniModule under given ID does not exist in given PartnerUniversity
      */
-    public void deleteUniModuleByPartnerUniversity(Long partnerUniversityId, Long uniModuleId) {
-        checkIfUniversityExists(partnerUniversityId);
-        if (!uniModuleRepository.existsByPartnerUniversityIdAndId(partnerUniversityId, uniModuleId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "module with id " + uniModuleId + " does not exist in university with id " + partnerUniversityId);
-        }
-
+    public void deleteUniModuleByPartnerUniversity(Long uniModuleId) {
         uniModuleRepository.deleteById(uniModuleId);
     }
 
@@ -194,5 +187,9 @@ public class UniModuleService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
                         "university with id " + partnerUniversityId + " does not exist"
                 ));
+    }
+
+    public UniModule getUniModuleById(Long uniModuleId) {
+        return uniModuleRepository.findById(uniModuleId).orElse(null);
     }
 }

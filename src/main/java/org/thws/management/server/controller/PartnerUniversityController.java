@@ -50,6 +50,10 @@ public class PartnerUniversityController {
      */
     @PostMapping
     public ResponseEntity<PartnerUniversityModel> addNewPartnerUniversity(@RequestBody PartnerUniversity partnerUniversity) {
+        if (partnerUniversity == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
         PartnerUniversity savedPartnerUniversity = partnerUniversityService.addNewPartnerUniversity(partnerUniversity);
         PartnerUniversityModel partnerUniversityModel = partnerUniversityModelAssembler.toModel(savedPartnerUniversity);
 
@@ -92,7 +96,7 @@ public class PartnerUniversityController {
         }
 
         if (partnerUniversities.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no partner universities found");
+            return ResponseEntity.notFound().build();
         }
 
         List<PartnerUniversityModel> partnerUniversityModels = partnerUniversities.getContent().stream()
@@ -130,6 +134,9 @@ public class PartnerUniversityController {
     public ResponseEntity<PartnerUniversityModel> getPartnerUniversity(
             @PathVariable("partnerUniversityId") Long partnerUniversityId) {
 
+        if (partnerUniversityService.getPartnerUniversityById(partnerUniversityId) == null) {
+            return ResponseEntity.notFound().build();
+        }
         PartnerUniversity partnerUniversity = partnerUniversityService.getPartnerUniversityById(partnerUniversityId);
         PartnerUniversityModel partnerUniversityModel = partnerUniversityModelAssembler.toModel(partnerUniversity);
 
@@ -147,6 +154,9 @@ public class PartnerUniversityController {
     public ResponseEntity<PartnerUniversityModel> updatePartnerUniversity(
             @PathVariable("partnerUniversityId") Long partnerUniversityId,
             @RequestBody PartnerUniversity partnerUniversity) {
+        if (partnerUniversityService.getPartnerUniversityById(partnerUniversityId) == null || partnerUniversity == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         PartnerUniversity updatePartnerUniversity = partnerUniversityService.updatePartnerUniversity(partnerUniversityId, partnerUniversity);
         PartnerUniversityModel partnerUniversityModel = partnerUniversityModelAssembler.toModel(updatePartnerUniversity);
@@ -162,6 +172,11 @@ public class PartnerUniversityController {
      */
     @DeleteMapping(path = "{partnerUniversityId}")
     public ResponseEntity<Void> deletePartnerUniversity(@PathVariable("partnerUniversityId") Long partnerUniversityId) {
+        PartnerUniversity partnerUniversity = partnerUniversityService.getPartnerUniversityById(partnerUniversityId);
+        if (partnerUniversity == null) {
+            return ResponseEntity.notFound().build();
+        }
+
         partnerUniversityService.deletePartnerUniversity(partnerUniversityId);
         return ResponseEntity.noContent().build();
     }

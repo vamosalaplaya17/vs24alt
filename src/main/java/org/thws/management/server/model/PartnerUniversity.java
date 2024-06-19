@@ -1,5 +1,6 @@
 package org.thws.management.server.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -29,7 +30,11 @@ public class PartnerUniversity {
     private String contactPerson;
     private Integer maxStudentsIn;
     private Integer maxStudentsOut;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate nextSpringSemester;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate nextSummerSemester;
 
     @OneToMany(mappedBy = "partnerUniversity", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -155,5 +160,22 @@ public class PartnerUniversity {
 
     public void setModules(List<UniModule> modules) {
         this.modules = modules;
+    }
+
+    @Override
+    public String toString() {
+        return "PartnerUniversity{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", country='" + country + '\'' +
+                ", departmentName='" + departmentName + '\'' +
+                ", departmentUrl='" + departmentUrl + '\'' +
+                ", contactPerson='" + contactPerson + '\'' +
+                ", maxStudentsIn=" + maxStudentsIn +
+                ", maxStudentsOut=" + maxStudentsOut +
+                ", nextSpringSemester=" + nextSpringSemester +
+                ", nextSummerSemester=" + nextSummerSemester +
+                ", modules=" + modules +
+                '}';
     }
 }

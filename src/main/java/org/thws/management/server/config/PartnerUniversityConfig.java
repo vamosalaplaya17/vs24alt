@@ -27,8 +27,8 @@ public class PartnerUniversityConfig {
                 "Edin Putzu",
                 30,
                 30,
-                LocalDate.of(2000, Month.MARCH, 17),
-                LocalDate.of(2000, Month.MARCH, 17)
+                LocalDate.of(2000, 3, 17),
+                LocalDate.of(2000, 3, 17)
         );
     }
 
@@ -42,8 +42,8 @@ public class PartnerUniversityConfig {
                 "Zlatan Ibrahimovic",
                 45,
                 45,
-                LocalDate.of(1987, Month.JUNE, 5),
-                LocalDate.of(1789, Month.JUNE, 5)
+                LocalDate.of(1987, 5, 5),
+                LocalDate.of(1789, 5, 5)
         );
     }
 

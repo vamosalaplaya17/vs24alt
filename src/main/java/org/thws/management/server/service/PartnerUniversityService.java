@@ -92,7 +92,7 @@ public class PartnerUniversityService {
      * @return The requested PartnerUniversity
      */
     public PartnerUniversity getPartnerUniversityById(Long partnerUniversityId) {
-        return getPartnerUniversity(partnerUniversityId);
+        return partnerUniversityRepository.findById(partnerUniversityId).orElse(null);
     }
 
     /**
@@ -104,7 +104,7 @@ public class PartnerUniversityService {
      */
     @Transactional
     public PartnerUniversity updatePartnerUniversity(Long partnerUniversityId, PartnerUniversity updateRequest) {
-        PartnerUniversity partnerUniversity = getPartnerUniversity(partnerUniversityId);
+        PartnerUniversity partnerUniversity = partnerUniversityRepository.findById(partnerUniversityId).orElse(null);
 
         if (updateRequest.getName() != null && !updateRequest.getName().isEmpty()) {
             partnerUniversity.setName(updateRequest.getName());
@@ -147,7 +147,6 @@ public class PartnerUniversityService {
      * @param partnerUniversityId ID of PartnerUniversity to be deleted
      */
     public void deletePartnerUniversity(Long partnerUniversityId) {
-        checkIfUniversityExists(partnerUniversityId);
         partnerUniversityRepository.deleteById(partnerUniversityId);
     }
 
@@ -161,31 +160,5 @@ public class PartnerUniversityService {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "university with name " + name + " exists already");
         }
-    }
-
-    /**
-     * Checks if PartnerUniversity with requested ID exists
-     *
-     * @param partnerUniversityId ID to check with
-     */
-    public void checkIfUniversityExists(Long partnerUniversityId) {
-        if (partnerUniversityRepository.findById(partnerUniversityId).isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "university with id " + partnerUniversityId + " doesn't exist");
-        }
-    }
-
-    /**
-     * Retrieves a PartnerUniversity by requested ID
-     *
-     * @param partnerUniversityId ID of requested PartnerUniversity
-     * @return The requested PartnerUniversity
-     * @throws ResponseStatusException If requested PartnerUniversity does not exist
-     */
-    private PartnerUniversity getPartnerUniversity(Long partnerUniversityId) {
-        return partnerUniversityRepository.findById(partnerUniversityId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "university with id " + partnerUniversityId + " does not exist"
-                ));
     }
 }

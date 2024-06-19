@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Representation model for a UniModule, containing only the basic information
+ * Representation model for a PartnerUniversity, containing only the basic information
  */
 public class PartnerUniversityModel extends RepresentationModel<PartnerUniversityModel> {
     private Long id;
@@ -110,5 +110,22 @@ public class PartnerUniversityModel extends RepresentationModel<PartnerUniversit
 
     public void setUniModuleModels(List<UniModuleModel> uniModules) {
         this.uniModuleModels = uniModules;
+    }
+
+    @Override
+    public String toString() {
+        return "PartnerUniversityModel{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", country='" + country + '\'' +
+                ", departmentName='" + departmentName + '\'' +
+                ", departmentUrl='" + departmentUrl + '\'' +
+                ", contactPerson='" + contactPerson + '\'' +
+                ", maxStudentsIn=" + maxStudentsIn +
+                ", maxStudentsOut=" + maxStudentsOut +
+                ", nextSpringSemester=" + nextSpringSemester +
+                ", nextSummerSemester=" + nextSummerSemester +
+                ", uniModuleModels=" + uniModuleModels +
+                '}';
     }
 }

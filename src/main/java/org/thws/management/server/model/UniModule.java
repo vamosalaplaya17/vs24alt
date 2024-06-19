@@ -39,6 +39,21 @@ public class UniModule {
         this.ects = ects;
         this.partnerUniversity = partnerUniversity;
     }
+    /**
+     * Constructs a new UniModule
+     *
+     * @param name Name of the UniModule
+     * @param semester Semester, in which UniModule takes place
+     * @param ects Credits of UniModule
+     * @param partnerUniversity Associated PartnerUniversity with UniModule
+     */
+    public UniModule(Long id, String name, int semester, int ects, PartnerUniversity partnerUniversity) {
+        this.id = id;
+        this.name = name;
+        this.semester = semester;
+        this.ects = ects;
+        this.partnerUniversity = partnerUniversity;
+    }
 
     //Getters and setters
     public Long getId() {
