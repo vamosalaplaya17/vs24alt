@@ -3,8 +3,8 @@
 This is Edin Putzu's solution for the third assignment - a management system to handle partner universities and their
 modules. Partner universities, as well as the modules, can be read, created, updated and deleted.
 
-Both can also be sorted by their name, either ascending or descending, and the universities can also be filtered by any
-combination of name, semester and ects.
+Both can also be sorted by their name, either ascending or descending, and the universities can also be filtered by any 
+combination of name, semester and ects. The video can be found under https://youtu.be/CgRGV7zLyzI
 
 # How to start the system
 
