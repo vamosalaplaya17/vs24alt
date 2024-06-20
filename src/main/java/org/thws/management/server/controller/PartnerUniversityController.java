@@ -161,20 +161,30 @@ public class PartnerUniversityController {
         HttpHeaders headers = new HttpHeaders();
 
         Link postLink = linkTo(methodOn(PartnerUniversityController.class).addNewPartnerUniversity(null))
-                .withSelfRel().withType("POST");
+                .withRel("create").withType("POST");
         headers.add("create", postLink.getHref());
+
+        if (sort.equals("asc")) {
+            Link selfLinkDesc = linkTo(methodOn(PartnerUniversityController.class).getPartnerUniversities(name, country, departmentName, page, size, "desc"))
+                    .withRel("sort").withType("GET");
+            headers.add("descending order", selfLinkDesc.getHref());
+        } else {
+            Link selfLinkAsc = linkTo(methodOn(PartnerUniversityController.class).getPartnerUniversities(name, country, departmentName, page, size, "asc"))
+                    .withRel("sort").withType("GET");
+            headers.add("ascending order", selfLinkAsc.getHref());
+        }
 
         if (partnerUniversities.hasPrevious()) {
             Link prevLink = linkTo(methodOn(PartnerUniversityController.class)
                     .getPartnerUniversities(name, country, departmentName, page - 1, size, sort))
-                    .withSelfRel().withType("GET");
+                    .withRel("previous").withType("GET");
             headers.add("previous page", prevLink.getHref());
         }
 
         if (partnerUniversities.hasNext()) {
             Link nextLink = linkTo(methodOn(PartnerUniversityController.class)
                     .getPartnerUniversities(name, country, departmentName, page + 1, size, sort))
-                    .withSelfRel().withType("GET");
+                    .withRel("next").withType("GET");
             headers.add("next page", nextLink.getHref());
         }
 
