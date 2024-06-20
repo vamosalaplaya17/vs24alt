@@ -27,7 +27,7 @@ public class UniModuleModelAssembler extends RepresentationModelAssemblerSupport
      * Converts UniModule to UniModuleModel
      *
      * @param uniModule The UniModule to convert
-     * @return Representation of UniModule as UniModuleModel
+     * @return Representation of UniModule as UniModuleModel with self link
      */
     @Override
     @NonNull
@@ -40,8 +40,6 @@ public class UniModuleModelAssembler extends RepresentationModelAssemblerSupport
         model.setEcts(uniModule.getEcts());
 
         model.add(linkTo(methodOn(UniModuleController.class).getUniModule(uniModule.getPartnerUniversity().getId(), uniModule.getId())).withSelfRel().withType("GET"));
-        model.add(linkTo(methodOn(UniModuleController.class).updateUniModule(uniModule.getPartnerUniversity().getId(), uniModule.getId(), null)).withRel("update").withType("PUT"));
-        model.add(linkTo(methodOn(UniModuleController.class).deleteUniModule(uniModule.getPartnerUniversity().getId(), uniModule.getId())).withRel("delete").withType("DELETE"));
 
         return model;
     }

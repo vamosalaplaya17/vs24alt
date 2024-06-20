@@ -1,6 +1,8 @@
 package org.thws.management;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,6 +16,7 @@ import org.thws.management.server.model.PartnerUniversity;
 
 import java.time.LocalDate;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
@@ -30,10 +33,9 @@ class PartnerUniversityApplicationTests {
         partnerUniversityClient = new PartnerUniversityClient(testRestTemplate.getRestTemplate());
     }
 
-    @Test
-    void testGetSinglePartnerUniversity() {
-        assertEquals(HttpStatus.OK, partnerUniversityClient.getSinglePartnerUniversity(1).getStatusCode());
-        assertEquals(HttpStatus.NOT_FOUND, partnerUniversityClient.getSinglePartnerUniversity(99).getStatusCode());
+    @AfterEach
+    void tearDown() {
+        partnerUniversityClient.resetDatabase();
     }
 
     @Test
@@ -56,45 +58,16 @@ class PartnerUniversityApplicationTests {
     }
 
     @Test
-    void updatePartnerUniversity() {
-        ResponseEntity<PartnerUniversity> response1 = partnerUniversityClient.getSinglePartnerUniversity(2);
-        assertEquals(HttpStatus.OK, response1.getStatusCode());
-
-        PartnerUniversity oldModel = response1.getBody();
-        String oldName = oldModel.getName();
-
-        oldModel.setName("new name");
-        partnerUniversityClient.updatePartnerUniversity(oldModel);
-        ResponseEntity<PartnerUniversity> response2 = partnerUniversityClient.getSinglePartnerUniversity(2);
-        assertEquals(HttpStatus.OK, response2.getStatusCode());
-
-        PartnerUniversity updatedModel = response2.getBody();
-        String updatedName = updatedModel.getName();
-
-        assertNotEquals(oldName, updatedName);
-
-        ResponseEntity<PartnerUniversity> response3 = partnerUniversityClient.getSinglePartnerUniversity(2);
-        PartnerUniversity deletedModel = response3.getBody();
-        deletedModel.setName("deleted name");
-        partnerUniversityClient.deletePartnerUniversity(2);
-        assertEquals(HttpStatus.NOT_FOUND, partnerUniversityClient.updatePartnerUniversity(deletedModel).getStatusCode());
-    }
-
-    @Test
-    void deletePartnerUniversity() {
-        assertEquals(HttpStatus.NO_CONTENT, partnerUniversityClient.deletePartnerUniversity(1).getStatusCode());
-        assertEquals(HttpStatus.NOT_FOUND, partnerUniversityClient.deletePartnerUniversity(1).getStatusCode());
+    void testGetSinglePartnerUniversity() {
+        assertEquals(HttpStatus.OK, partnerUniversityClient.getSinglePartnerUniversity(1).getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, partnerUniversityClient.getSinglePartnerUniversity(99).getStatusCode());
     }
 
     @Test
     void testGetAllPartnerUniversities() {
         ResponseEntity<PagedModel<PartnerUniversity>> response = partnerUniversityClient.getAllPartnerUniversities();
         assertEquals(HttpStatus.OK, response.getStatusCode());
-
-        partnerUniversityClient.deletePartnerUniversity(1);
-        partnerUniversityClient.deletePartnerUniversity(2);
-        ResponseEntity<PagedModel<PartnerUniversity>> response2 = partnerUniversityClient.getAllPartnerUniversities();
-        assertEquals(HttpStatus.NOT_FOUND, response2.getStatusCode());
+        assertTrue(response.getBody().getContent().size() > 1);
     }
 
     @Test
@@ -198,5 +171,36 @@ class PartnerUniversityApplicationTests {
         ResponseEntity<PagedModel<PartnerUniversity>> response8 = partnerUniversityClient.getAllPartnerUniversitiesByFilters(
                 "non existent", "non existent", "non existent");
         assertEquals(HttpStatus.NOT_FOUND, response8.getStatusCode());
+    }
+
+    @Test
+    void updatePartnerUniversity() {
+        ResponseEntity<PartnerUniversity> response1 = partnerUniversityClient.getSinglePartnerUniversity(2);
+        assertEquals(HttpStatus.OK, response1.getStatusCode());
+
+        PartnerUniversity oldModel = response1.getBody();
+        String oldName = oldModel.getName();
+
+        oldModel.setName("new name");
+        partnerUniversityClient.updatePartnerUniversity(oldModel);
+        ResponseEntity<PartnerUniversity> response2 = partnerUniversityClient.getSinglePartnerUniversity(2);
+        assertEquals(HttpStatus.OK, response2.getStatusCode());
+
+        PartnerUniversity updatedModel = response2.getBody();
+        String updatedName = updatedModel.getName();
+
+        assertNotEquals(oldName, updatedName);
+
+        ResponseEntity<PartnerUniversity> response3 = partnerUniversityClient.getSinglePartnerUniversity(2);
+        PartnerUniversity deletedModel = response3.getBody();
+        deletedModel.setName("deleted name");
+        partnerUniversityClient.deletePartnerUniversity(2);
+        assertEquals(HttpStatus.NOT_FOUND, partnerUniversityClient.updatePartnerUniversity(deletedModel).getStatusCode());
+    }
+
+    @Test
+    void deletePartnerUniversity() {
+        assertEquals(HttpStatus.NO_CONTENT, partnerUniversityClient.deletePartnerUniversity(1).getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, partnerUniversityClient.deletePartnerUniversity(1).getStatusCode());
     }
 }

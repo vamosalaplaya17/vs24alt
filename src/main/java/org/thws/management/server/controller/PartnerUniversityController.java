@@ -4,15 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
+import org.thws.management.server.assembler.PartnerUniversityModelAssembler;
 import org.thws.management.server.model.PartnerUniversity;
 import org.thws.management.server.model.PartnerUniversityModel;
-import org.thws.management.server.assembler.PartnerUniversityModelAssembler;
 import org.thws.management.server.service.PartnerUniversityService;
 
 import java.util.List;
@@ -46,13 +46,20 @@ public class PartnerUniversityController {
      * Creates a new PartnerUniversity
      *
      * @param partnerUniversity PartnerUniversity data to be used to create a new PartnerUniversity
-     * @return ResponseEntity containing the new PartnerUniversity
+     * @return ResponseEntity containing the new PartnerUniversity with status code 201
+     * Status code 400 if request body is wrongly formatted
      */
     @PostMapping
     public ResponseEntity<PartnerUniversityModel> addNewPartnerUniversity(@RequestBody PartnerUniversity partnerUniversity) {
-        if (partnerUniversity == null) {
-            return ResponseEntity.badRequest().build();
-        }
+        if (partnerUniversity.getName() == null || partnerUniversity.getName().isEmpty() ||
+                partnerUniversity.getCountry() == null || partnerUniversity.getCountry().isEmpty() ||
+                partnerUniversity.getDepartmentName() == null || partnerUniversity.getDepartmentName().isEmpty() ||
+                partnerUniversity.getDepartmentUrl() == null || partnerUniversity.getDepartmentUrl().isEmpty() ||
+                partnerUniversity.getContactPerson() == null || partnerUniversity.getContactPerson().isEmpty() ||
+                partnerUniversity.getMaxStudentsIn() == null ||
+                partnerUniversity.getMaxStudentsOut() == null ||
+                partnerUniversity.getNextSpringSemester() == null ||
+                partnerUniversity.getNextSummerSemester() == null) return ResponseEntity.badRequest().build();
 
         PartnerUniversity savedPartnerUniversity = partnerUniversityService.addNewPartnerUniversity(partnerUniversity);
         PartnerUniversityModel partnerUniversityModel = partnerUniversityModelAssembler.toModel(savedPartnerUniversity);
@@ -66,6 +73,36 @@ public class PartnerUniversityController {
     }
 
     /**
+     * Retrieves one specific PartnerUniversity
+     *
+     * @param partnerUniversityId ID of PartnerUniversity to retrieve
+     * @return ResponseEntity containing model of requested PartnerUniversity with status code 200
+     * Status code 404 if requested PartnerUniversity does not exist
+     */
+    @GetMapping(path = "{partnerUniversityId}")
+    public ResponseEntity<PartnerUniversityModel> getPartnerUniversity(
+            @PathVariable("partnerUniversityId") Long partnerUniversityId) {
+
+        if (partnerUniversityService.getPartnerUniversityById(partnerUniversityId) == null) {
+            return ResponseEntity.notFound().build();
+        }
+        PartnerUniversity partnerUniversity = partnerUniversityService.getPartnerUniversityById(partnerUniversityId);
+        PartnerUniversityModel partnerUniversityModel = partnerUniversityModelAssembler.toModel(partnerUniversity);
+
+        HttpHeaders headers = new HttpHeaders();
+
+        Link updateLink = linkTo(methodOn(PartnerUniversityController.class).getPartnerUniversity(partnerUniversityId))
+                .withSelfRel().withType("PUT");
+        headers.add("update", updateLink.getHref());
+
+        Link deleteLink = linkTo(methodOn(PartnerUniversityController.class).getPartnerUniversity(partnerUniversityId))
+                .withSelfRel().withType("DELETE");
+        headers.add("delete", deleteLink.getHref());
+
+        return ResponseEntity.ok().headers(headers).body(partnerUniversityModel);
+    }
+
+    /**
      * Retrieves every PartnerUniversity available and creates related links
      * If name, country and departmentName are set, it filters the PartnerUniversities accordingly
      *
@@ -74,8 +111,8 @@ public class PartnerUniversityController {
      * @param departmentName Department name of PartnerUniversity
      * @param page           Page number to retrieve, default is 0
      * @param size           Number of PartnerUniversities to show per page, standard is 3 (to make testing easier)
-     * @return Page containing PartnerUniversities
-     * @throws ResponseStatusException if there are no PartnerUniversities to show
+     * @return Page containing PartnerUniversities with status code 200
+     * Status code 404 if it finds nothing
      */
     @GetMapping
     public ResponseEntity<PagedModel<PartnerUniversityModel>> getPartnerUniversities(
@@ -83,10 +120,15 @@ public class PartnerUniversityController {
             @RequestParam(required = false) String country,
             @RequestParam(required = false) String departmentName,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "3") int size) {
+            @RequestParam(defaultValue = "2") int size,
+            @RequestParam(required = false, defaultValue = "asc") String sort) {
 
         Page<PartnerUniversity> partnerUniversities;
-        Pageable pageable = PageRequest.of(page, size);
+
+        Sort.Direction sortDirection = sort.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort sortObject = Sort.by(sortDirection, "name");
+
+        Pageable pageable = PageRequest.of(page, size, sortObject);
 
         if (name != null || country != null || departmentName != null) {
             partnerUniversities = partnerUniversityService.getAllPartnerUniversitiesWithFilters(
@@ -112,35 +154,36 @@ public class PartnerUniversityController {
 
         PagedModel<PartnerUniversityModel> pagedModel = PagedModel.of(partnerUniversityModels, pageMetadata);
 
-        Link selfLink = linkTo(methodOn(PartnerUniversityController.class).getPartnerUniversities(name, country, departmentName, page, size))
+        Link selfLink = linkTo(methodOn(PartnerUniversityController.class).getPartnerUniversities(name, country, departmentName, page, size, sort))
                 .withSelfRel().withType("GET");
+        pagedModel.add(selfLink);
+
+        HttpHeaders headers = new HttpHeaders();
+
+        Link selfLinkFilters = linkTo(methodOn(PartnerUniversityController.class)
+                .getPartnerUniversities(name, country, departmentName, page, size, sort))
+                .withSelfRel().withType("GET");
+        headers.add("filter", selfLinkFilters.getHref());
 
         Link postLink = linkTo(methodOn(PartnerUniversityController.class).addNewPartnerUniversity(null))
-                .withRel("create").withType("POST");
+                .withSelfRel().withType("POST");
+        headers.add("create", postLink.getHref());
 
-        pagedModel.add(selfLink);
-        pagedModel.add(postLink);
-
-        return ResponseEntity.ok(pagedModel);
-    }
-
-    /**
-     * Retrieves one specific PartnerUniversity
-     *
-     * @param partnerUniversityId ID of PartnerUniversity to retrieve
-     * @return ResponseEntity containing model of requested PartnerUniversity
-     */
-    @GetMapping(path = "{partnerUniversityId}")
-    public ResponseEntity<PartnerUniversityModel> getPartnerUniversity(
-            @PathVariable("partnerUniversityId") Long partnerUniversityId) {
-
-        if (partnerUniversityService.getPartnerUniversityById(partnerUniversityId) == null) {
-            return ResponseEntity.notFound().build();
+        if (partnerUniversities.hasPrevious()) {
+            Link prevLink = linkTo(methodOn(PartnerUniversityController.class)
+                    .getPartnerUniversities(name, country, departmentName, page - 1, size, sort))
+                    .withSelfRel().withType("GET");
+            headers.add("previous page", prevLink.getHref());
         }
-        PartnerUniversity partnerUniversity = partnerUniversityService.getPartnerUniversityById(partnerUniversityId);
-        PartnerUniversityModel partnerUniversityModel = partnerUniversityModelAssembler.toModel(partnerUniversity);
 
-        return ResponseEntity.ok(partnerUniversityModel);
+        if (partnerUniversities.hasNext()) {
+            Link nextLink = linkTo(methodOn(PartnerUniversityController.class)
+                    .getPartnerUniversities(name, country, departmentName, page + 1, size, sort))
+                    .withSelfRel().withType("GET");
+            headers.add("next page", nextLink.getHref());
+        }
+
+        return ResponseEntity.ok().headers(headers).body(pagedModel);
     }
 
     /**
@@ -148,7 +191,8 @@ public class PartnerUniversityController {
      *
      * @param partnerUniversityId ID of PartnerUniversity to update
      * @param partnerUniversity   Content to update PartnerUniversity with
-     * @return ResponseEntity containing model of updated PartnerUniversity
+     * @return ResponseEntity containing model of updated PartnerUniversity with status code 200
+     * Status code 404 if it doesn't find requested PartnerUniversity
      */
     @PutMapping(path = "{partnerUniversityId}")
     public ResponseEntity<PartnerUniversityModel> updatePartnerUniversity(
@@ -169,6 +213,7 @@ public class PartnerUniversityController {
      *
      * @param partnerUniversityId ID of PartnerUniversity to delete
      * @return Status Code 204 upon successful deletion
+     * Status code 404 if it can't find requested PartnerUniversity
      */
     @DeleteMapping(path = "{partnerUniversityId}")
     public ResponseEntity<Void> deletePartnerUniversity(@PathVariable("partnerUniversityId") Long partnerUniversityId) {

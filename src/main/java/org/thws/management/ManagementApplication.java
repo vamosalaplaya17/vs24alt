@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
- * Responsible for starting the management system
+ * Automatically generated class to start the system without using Docker, under port 8080
  */
 @SpringBootApplication(scanBasePackages = "org.thws.management")
 @EnableJpaRepositories

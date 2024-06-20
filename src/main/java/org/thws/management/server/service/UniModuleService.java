@@ -12,6 +12,8 @@ import org.thws.management.server.model.UniModule;
 import org.thws.management.server.repository.PartnerUniversityRepository;
 import org.thws.management.server.repository.UniModuleRepository;
 
+import java.util.Optional;
+
 /**
  * Service class for managing UniModules in relation to PartnerUniversities
  */
@@ -38,10 +40,10 @@ public class UniModuleService {
      * @param partnerUniversityId ID of the PartnerUniversity to add the UniModule to
      * @param uniModule           UniModule to be added to PartnerUniversity under given ID
      * @return The added UniModule
-     * @throws ResponseStatusException If a UniModule with the given name already exists
+     * @throws ResponseStatusException When UniModule with requested name already exists
      */
     public UniModule addNewUniModule(Long partnerUniversityId, UniModule uniModule) {
-        PartnerUniversity partnerUniversity = getPartnerUniversity(partnerUniversityId);
+        PartnerUniversity partnerUniversity = partnerUniversityRepository.findById(partnerUniversityId).orElse(null);
 
         if (uniModuleRepository.findUniModuleByName(uniModule.getName()).isPresent()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "UniModule already exists");
@@ -52,6 +54,16 @@ public class UniModuleService {
     }
 
     /**
+     * Fetches an UniModule by its ID
+     *
+     * @param uniModuleId ID of UniModule
+     * @return UniModule of requested ID
+     */
+    public UniModule getUniModuleById(Long uniModuleId) {
+        return uniModuleRepository.findById(uniModuleId).orElse(null);
+    }
+
+    /**
      * Retrieves a page containing UniModules, for requested PartnerUniversity
      *
      * @param partnerUniversityId ID of PartnerUniversity to get UniModules from
@@ -59,65 +71,18 @@ public class UniModuleService {
      * @return Every available UniModule divided into pages
      */
     public Page<UniModule> getAllUniModulesByPartnerUniversity(Long partnerUniversityId, Pageable pageable) {
-        //checks if PartnerUniversity exists
-        checkIfUniversityExists(partnerUniversityId);
-
         return uniModuleRepository.findByPartnerUniversityId(partnerUniversityId, pageable);
-    }
-
-    /**
-     * Retrieves page(s) containing filtered UniModules, filtered by any combination of name, semester, and ects,
-     * for requested PartnerUniversity
-     *
-     * @param partnerUniversityId ID of requested PartnerUniversity
-     * @param name                Name of UniModule to be filtered by
-     * @param semester            Semester of UniModule to be filtered by
-     * @param ects                Credits of UniModule to be filtered by
-     * @param pageable            Paging information
-     * @return Every available UniModule divided into pages, affected by filters
-     */
-    public Page<UniModule> getAllUniModulesByPartnerUniversityWithFilters(
-            Long partnerUniversityId, String name, Integer semester, Integer ects, Pageable pageable) {
-        //checks if PartnerUniversity exists
-        checkIfUniversityExists(partnerUniversityId);
-
-        if (name != null && semester != null && ects != null) {
-            return uniModuleRepository.findByPartnerUniversityIdAndNameIgnoreCaseAndSemesterAndEcts(partnerUniversityId,
-                    name.toLowerCase(), semester, ects, pageable);
-        } else if (name != null && semester != null) {
-            return uniModuleRepository.findByPartnerUniversityIdAndNameIgnoreCaseAndSemester(partnerUniversityId,
-                    name.toLowerCase(), semester, pageable);
-        } else if (name != null && ects != null) {
-            return uniModuleRepository.findByPartnerUniversityIdAndNameIgnoreCaseAndEcts(partnerUniversityId, name,
-                    ects, pageable);
-        } else if (semester != null && ects != null) {
-            return uniModuleRepository.findByPartnerUniversityIdAndSemesterAndEcts(partnerUniversityId, semester, ects, pageable);
-        } else if (name != null) {
-            return uniModuleRepository.findByPartnerUniversityIdAndNameIgnoreCase(partnerUniversityId, name.toLowerCase(), pageable);
-        } else if (semester != null) {
-            return uniModuleRepository.findByPartnerUniversityIdAndSemester(partnerUniversityId, semester, pageable);
-        } else if (ects != null) {
-            return uniModuleRepository.findByPartnerUniversityIdAndEcts(partnerUniversityId, ects, pageable);
-        } else {
-            return Page.empty();
-        }
     }
 
     /**
      * Retrieve one specific UniModule in relation to a PartnerUniversity
      *
-     * @param partnerUniversityId ID of PartnerUniversity to remove UniModule from
+     * @param partnerUniversityId ID of PartnerUniversity to retrieve UniModule from
      * @param uniModuleId         ID of UniModule to retrieve
      * @return The requested UniModule
-     * @throws ResponseStatusException If the UniModule ID does not exist in the requested PartnerUniversity
      */
     public UniModule getUniModuleByPartnerUniversity(Long partnerUniversityId, Long uniModuleId) {
-        //checks if PartnerUniversity exists
-        checkIfUniversityExists(partnerUniversityId);
-        return uniModuleRepository.findByPartnerUniversityIdAndId(partnerUniversityId, uniModuleId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "module with id " + uniModuleId + " does not exist in university with id " + partnerUniversityId
-                ));
+        return uniModuleRepository.findByPartnerUniversityIdAndId(partnerUniversityId, uniModuleId).orElse(null);
     }
 
     /**
@@ -127,15 +92,11 @@ public class UniModuleService {
      * @param uniModuleId         ID of UniModule to update
      * @param updateRequest       Requested changes to make to UniModule
      * @return The updated UniModule
-     * @throws ResponseStatusException If the UniModule ID does not exist in the requested PartnerUniversity
      */
     @Transactional
     public UniModule updateUniModuleByPartnerUniversity(Long partnerUniversityId, Long uniModuleId, UniModule updateRequest) {
-        checkIfUniversityExists(partnerUniversityId);
-        UniModule uniModule = uniModuleRepository.findByPartnerUniversityIdAndId(partnerUniversityId, uniModuleId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "module with id " + uniModuleId + " does not exist in university with id " + partnerUniversityId
-                ));
+        Optional<UniModule> optionalModule = uniModuleRepository.findByPartnerUniversityIdAndId(partnerUniversityId, uniModuleId);
+        UniModule uniModule = optionalModule.orElseThrow();
 
         if (updateRequest.getName() != null && !updateRequest.getName().isEmpty()) {
             uniModule.setName(updateRequest.getName());
@@ -155,41 +116,9 @@ public class UniModuleService {
     /**
      * Deletes one specific UniModule
      *
-     * @param uniModuleId         ID of UniModule to delete
-     * @throws ResponseStatusException If UniModule under given ID does not exist in given PartnerUniversity
+     * @param uniModuleId ID of UniModule to delete
      */
     public void deleteUniModuleByPartnerUniversity(Long uniModuleId) {
         uniModuleRepository.deleteById(uniModuleId);
-    }
-
-    /**
-     * Checks if requested PartnerUniversity exists
-     *
-     * @param partnerUniversityId ID of requested PartnerUniversity
-     * @throws ResponseStatusException If PartnerUniversity under ID partnerUniversityID does not exist
-     */
-    public void checkIfUniversityExists(Long partnerUniversityId) {
-        if (partnerUniversityRepository.findById(partnerUniversityId).isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "university with id " + partnerUniversityId + " does not exist");
-        }
-    }
-
-    /**
-     * Retrieves a PartnerUniversity by requested ID
-     *
-     * @param partnerUniversityId ID of requested PartnerUniversity
-     * @return The requested PartnerUniversity
-     * @throws ResponseStatusException If requested PartnerUniversity does not exist
-     */
-    private PartnerUniversity getPartnerUniversity(Long partnerUniversityId) {
-        return partnerUniversityRepository.findById(partnerUniversityId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "university with id " + partnerUniversityId + " does not exist"
-                ));
-    }
-
-    public UniModule getUniModuleById(Long uniModuleId) {
-        return uniModuleRepository.findById(uniModuleId).orElse(null);
     }
 }

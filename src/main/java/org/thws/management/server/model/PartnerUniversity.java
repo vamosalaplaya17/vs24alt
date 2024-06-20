@@ -10,6 +10,7 @@ import java.util.List;
  * Represents a university, called PartnerUniversity
  */
 @Entity
+@Table(name = "PARTNER_UNIVERSITY")
 public class PartnerUniversity {
     @Id
     @SequenceGenerator(

@@ -4,17 +4,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
-import org.thws.management.server.model.PartnerUniversity;
 import org.thws.management.server.assembler.UniModuleModelAssembler;
+import org.thws.management.server.model.PartnerUniversity;
+import org.thws.management.server.model.UniModule;
 import org.thws.management.server.model.UniModuleModel;
 import org.thws.management.server.service.PartnerUniversityService;
-import org.thws.management.server.model.UniModule;
 import org.thws.management.server.service.UniModuleService;
 
 import java.util.List;
@@ -31,6 +31,10 @@ public class UniModuleController {
     private final UniModuleService uniModuleService;
     private final UniModuleModelAssembler uniModuleModelAssembler;
     private final PartnerUniversityService partnerUniversityService;
+
+    public static final String DEFAULT_PAGE = "0";
+    public static final String DEFAULT_SIZE = "3";
+    public static final String DEFAULT_SORT = "asc";
 
     /**
      * Constructs a new UniModuleController
@@ -53,7 +57,9 @@ public class UniModuleController {
      *
      * @param partnerUniversityId ID of PartnerUniversity to create UniModule for
      * @param uniModule           UniModule body
-     * @return ResponseEntity containing newly created UniModule
+     * @return Status code 200 and ResponseEntity containing added UniModule
+     * Status code 404 if requested PartnerUniversity does not exist
+     * Status code 400 if UniModule to add is wrongly formatted
      */
     @PostMapping
     public ResponseEntity<UniModuleModel> addNewUniModule(@PathVariable Long partnerUniversityId,
@@ -61,9 +67,11 @@ public class UniModuleController {
         if (partnerUniversityService.getPartnerUniversityById(partnerUniversityId) == null) {
             return ResponseEntity.notFound().build();
         }
-        if (uniModule == null) {
-            return ResponseEntity.badRequest().build();
-        }
+        if (uniModule.getName() == null || uniModule.getName().isEmpty() ||
+                uniModule.getSemester() == null ||
+                uniModule.getEcts() == null) return ResponseEntity.badRequest().build();
+
+        HttpHeaders headers = getHeadersForSingleUniModule(partnerUniversityId, uniModule.getId());
 
         UniModule savedUniModule = uniModuleService.addNewUniModule(partnerUniversityId, uniModule);
         UniModuleModel uniModuleModel = uniModuleModelAssembler.toModel(savedUniModule);
@@ -73,43 +81,60 @@ public class UniModuleController {
                         methodOn(UniModuleController.class)
                                 .getUniModule(savedUniModule.getId(), partnerUniversityId))
                         .toUri())
-                .body(uniModuleModel);
+                .headers(headers).body(uniModuleModel);
     }
 
     /**
-     * Gets all UniModules, divided in pages, and creates related links
-     * Potentially filtered by any combination of name, semester and ects
+     * Fetch one specific UniModule
+     *
+     * @param partnerUniversityId ID of PartnerUniversity to retrieve specific UniModule from
+     * @param uniModuleId         ID of UniModule to get
+     * @return ResponseEntity of requested UniModule with status code 200
+     * Status code 404 if nothing is found
+     */
+    @GetMapping(path = "{uniModuleId}")
+    public ResponseEntity<UniModuleModel> getUniModule(
+            @PathVariable("partnerUniversityId") Long partnerUniversityId,
+            @PathVariable("uniModuleId") Long uniModuleId) {
+        if (checkIfNull(partnerUniversityId, uniModuleId)) return ResponseEntity.notFound().build();
+
+        HttpHeaders headers = getHeadersForSingleUniModule(partnerUniversityId, uniModuleId);
+
+        UniModule uniModule = uniModuleService.getUniModuleByPartnerUniversity(partnerUniversityId, uniModuleId);
+        UniModuleModel uniModuleModel = uniModuleModelAssembler.toModel(uniModule);
+
+        return ResponseEntity.ok().headers(headers).body(uniModuleModel);
+    }
+
+    /**
+     * Gets all UniModules, divided in pages
+     * Potentially sorted by asc or desc
      *
      * @param partnerUniversityId ID of PartnerUniversity to retrieve UniModules from
-     * @param name                Name of the UniModules to be filtered by
-     * @param semester            Semester of the UniModules to be filtered by
-     * @param ects                Credits of the UniModules to be filtered by
      * @param page                Page number to retrieve, default value is 0
      * @param size                Number of total UniModules per page, default is 2 (to make testing easier)
-     * @return Page of UniModule
-     * @throws ResponseStatusException If no UniModules are found
+     * @param sort                Sorts the UniModules by name, having ascending as the default value
+     * @return Page of UniModule with status code 200
+     * Status code 404 if no UniModule is found
      */
     @GetMapping
     public ResponseEntity<PagedModel<UniModuleModel>> getAllUniModules(
             @PathVariable Long partnerUniversityId,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) Integer semester,
-            @RequestParam(required = false) Integer ects,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "3") int size) {
+            @RequestParam(defaultValue = DEFAULT_PAGE) int page,
+            @RequestParam(defaultValue = DEFAULT_SIZE) int size,
+            @RequestParam(required = false, defaultValue = DEFAULT_SORT) String sort) {
 
         Page<UniModule> uniModules;
-        Pageable pageable = PageRequest.of(page, size);
 
-        if (name != null || semester != null || ects != null) {
-            uniModules = uniModuleService.getAllUniModulesByPartnerUniversityWithFilters(
-                    partnerUniversityId, name, semester, ects, pageable);
-        } else {
-            uniModules = uniModuleService.getAllUniModulesByPartnerUniversity(partnerUniversityId, pageable);
-        }
+        Sort.Direction sortDirection = sort.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Sort sortObject = Sort.by(sortDirection, "name");
+
+        Pageable pageable = PageRequest.of(page, size, sortObject);
+
+        uniModules = uniModuleService.getAllUniModulesByPartnerUniversity(partnerUniversityId, pageable);
 
         if (uniModules.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no uni modules found");
+            return ResponseEntity.notFound().build();
         }
 
         List<UniModuleModel> uniModuleModels = uniModules.getContent().stream()
@@ -125,42 +150,33 @@ public class UniModuleController {
 
         PagedModel<UniModuleModel> pagedModel = PagedModel.of(uniModuleModels, pageMetadata);
 
-        Link selfLink = linkTo(methodOn(UniModuleController.class).getAllUniModules(partnerUniversityId, name, semester, ects, page, size))
+        Link selfLink = linkTo(methodOn(UniModuleController.class).getAllUniModules(partnerUniversityId, page, size, sort))
                 .withSelfRel().withType("GET");
+        pagedModel.add(selfLink);
+
+        HttpHeaders headers = new HttpHeaders();
 
         Link postLink = linkTo(methodOn(UniModuleController.class).addNewUniModule(partnerUniversityId, null))
                 .withRel("create").withType("POST");
+        headers.add("create", postLink.getHref());
 
-        pagedModel.add(selfLink);
-        pagedModel.add(postLink);
-
-        return ResponseEntity.ok(pagedModel);
-    }
-
-    /**
-     * Get one specific UniModule
-     *
-     * @param partnerUniversityId ID of PartnerUniversity to retrieve specific UniModule from
-     * @param uniModuleId         ID of UniModule to get
-     * @return ResponseEntity of requested UniModule
-     */
-    @GetMapping(path = "{uniModuleId}")
-    public ResponseEntity<UniModuleModel> getUniModule(
-            @PathVariable("partnerUniversityId") Long partnerUniversityId,
-            @PathVariable("uniModuleId") Long uniModuleId) {
-        if (partnerUniversityService.getPartnerUniversityById(partnerUniversityId) == null) {
-            return ResponseEntity.notFound().build();
-        }
-        if (uniModuleService.getUniModuleById(uniModuleId) == null) {
-            return ResponseEntity.notFound().build();
-        }
-        if (uniModuleService.getUniModuleByPartnerUniversity(partnerUniversityId, uniModuleId) == null) {
-            return ResponseEntity.notFound().build();
+        if (uniModules.hasPrevious()) {
+            Link prevLink = linkTo(methodOn(UniModuleController.class).getAllUniModules(partnerUniversityId, page - 1, size, sort))
+                    .withRel("previous").withType("GET");
+            headers.add("previous page", prevLink.getHref());
         }
 
-        UniModule uniModule = uniModuleService.getUniModuleByPartnerUniversity(partnerUniversityId, uniModuleId);
-        UniModuleModel uniModuleModel = uniModuleModelAssembler.toModel(uniModule);
-        return ResponseEntity.ok(uniModuleModel);
+        if (uniModules.hasNext()) {
+            Link nextLink = linkTo(methodOn(UniModuleController.class).getAllUniModules(partnerUniversityId, page - 1, size, sort)).withSelfRel()
+                    .withRel("next").withType("GET");
+            headers.add("next page", nextLink.getHref());
+        }
+
+        Link partnerUniversityLink = linkTo(methodOn(PartnerUniversityController.class).getPartnerUniversity(partnerUniversityId))
+                .withRel("partnerUniversity").withType("GET");
+        headers.add("partner-university", partnerUniversityLink.getHref());
+
+        return ResponseEntity.ok().headers(headers).body(pagedModel);
     }
 
     /**
@@ -169,16 +185,22 @@ public class UniModuleController {
      * @param partnerUniversityId ID of PartnerUniversity whose UniModule is to be updated
      * @param uniModuleId         ID of UniModule to update
      * @param uniModule           Content used to update UniModule
-     * @return ResponseEntity of updated UniModule
+     * @return ResponseEntity of updated UniModule with status code 200
+     * Status code 404 if nothing is found, Status code 400 if request is wrongly formatted
      */
     @PutMapping(path = "{uniModuleId}")
     public ResponseEntity<UniModuleModel> updateUniModule(
             @PathVariable("partnerUniversityId") Long partnerUniversityId,
             @PathVariable("uniModuleId") Long uniModuleId,
             @RequestBody UniModule uniModule) {
+        if (checkIfNull(partnerUniversityId, uniModuleId)) return ResponseEntity.notFound().build();
+        if (uniModule == null) return ResponseEntity.badRequest().build();
+
+        HttpHeaders headers = getHeadersForSingleUniModule(partnerUniversityId, uniModuleId);
+
         UniModule updatedUniModule = uniModuleService.updateUniModuleByPartnerUniversity(partnerUniversityId, uniModuleId, uniModule);
         UniModuleModel uniModuleModel = uniModuleModelAssembler.toModel(updatedUniModule);
-        return ResponseEntity.ok(uniModuleModel);
+        return ResponseEntity.ok().headers(headers).body(uniModuleModel);
     }
 
     /**
@@ -187,18 +209,61 @@ public class UniModuleController {
      * @param partnerUniversityId ID of PartnerUniversity where UniModule shall be deleted from
      * @param uniModuleId         ID of UniModule to be deleted
      * @return ResponseEntity with status code 204 No Content
+     * Status code 404 if nothing is found
      */
     @DeleteMapping(path = "{uniModuleId}")
     public ResponseEntity<Void> deleteUniModule(@PathVariable("partnerUniversityId") Long partnerUniversityId,
                                                 @PathVariable("uniModuleId") Long uniModuleId) {
-        if (partnerUniversityService.getPartnerUniversityById(partnerUniversityId) == null) {
-            ResponseEntity.notFound().build();
-        }
-        if (uniModuleService.getUniModuleByPartnerUniversity(partnerUniversityId, uniModuleId) == null) {
-            ResponseEntity.notFound().build();
-        }
+        if (checkIfNull(partnerUniversityId, uniModuleId)) return ResponseEntity.notFound().build();
+
+        HttpHeaders headers = getHeadersForSingleUniModule(partnerUniversityId, uniModuleId);
 
         uniModuleService.deleteUniModuleByPartnerUniversity(uniModuleId);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.noContent().headers(headers).build();
+    }
+
+    /**
+     * Builds links in the Response Header for requests containing only a single UniModule
+     *
+     * @param partnerUniversityId ID of the PartnerUniversity
+     * @param uniModuleId         ID of the UniModule
+     * @return Links for updating and deleting an UniModule, link for going back to /modules,
+     * and link to go back to PartnerUniversity
+     */
+    public HttpHeaders getHeadersForSingleUniModule(Long partnerUniversityId, Long uniModuleId) {
+        HttpHeaders headers = new HttpHeaders();
+
+        Link updateLink = linkTo(methodOn(UniModuleController.class).getUniModule(partnerUniversityId, uniModuleId))
+                .withRel("update").withType("PUT");
+        headers.add("update", updateLink.getHref());
+
+        Link deleteLink = linkTo(methodOn(UniModuleController.class).deleteUniModule(partnerUniversityId, uniModuleId))
+                .withRel("delete").withType("DELETE");
+        headers.add("delete", deleteLink.getHref());
+
+        Link allModulesLink = linkTo(methodOn(UniModuleController.class)
+                .getAllUniModules(partnerUniversityId, Integer.parseInt(DEFAULT_PAGE), Integer.parseInt(DEFAULT_SIZE), DEFAULT_SORT))
+                .withRel("modules").withType("GET");
+        headers.add("modules", allModulesLink.getHref());
+
+        Link partnerUniversityLink = linkTo(methodOn(PartnerUniversityController.class).getPartnerUniversity(partnerUniversityId))
+                .withRel("partnerUniversity").withType("GET");
+        headers.add("partner-university", partnerUniversityLink.getHref());
+
+        return headers;
+    }
+
+    /**
+     * Method to check if requested PartnerUniversity and UniModule exists
+     *
+     * @param partnerUniversityId ID of PartnerUniversity
+     * @param uniModuleId         ID of UniModule
+     * @return true if nothing is found, otherwise false
+     */
+    public boolean checkIfNull(Long partnerUniversityId, Long uniModuleId) {
+        PartnerUniversity partnerUniversity = partnerUniversityService.getPartnerUniversityById(partnerUniversityId);
+        UniModule uniModule = uniModuleService.getUniModuleById(uniModuleId);
+
+        return partnerUniversity == null || uniModule == null;
     }
 }

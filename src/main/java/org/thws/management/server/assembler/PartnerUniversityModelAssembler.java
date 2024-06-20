@@ -39,23 +39,20 @@ public class PartnerUniversityModelAssembler extends RepresentationModelAssemble
      * Converts given PartnerUniversity into a model representation
      *
      * @param partnerUniversity PartnerUniversity to convert
-     * @return Converted model with related HATEOAS links
+     * @return Converted model with self link
      */
     @Override
     @NonNull
     public PartnerUniversityModel toModel(@NonNull PartnerUniversity partnerUniversity) {
         PartnerUniversityModel partnerUniversityModel = convertToModel(partnerUniversity);
 
-        partnerUniversityModel.add(linkTo(methodOn(PartnerUniversityController.class).getPartnerUniversity(partnerUniversityModel.getId())).withSelfRel().withType("GET"));
-        partnerUniversityModel.add(linkTo(methodOn(PartnerUniversityController.class).updatePartnerUniversity(partnerUniversityModel.getId(), null)).withRel("update").withType("PUT"));
-        partnerUniversityModel.add(linkTo(methodOn(PartnerUniversityController.class).deletePartnerUniversity(partnerUniversityModel.getId())).withRel("delete").withType("DELETE"));
+        partnerUniversityModel.add(linkTo(methodOn(PartnerUniversityController.class).getPartnerUniversity(partnerUniversityModel.getId())).withSelfRel());
 
         return partnerUniversityModel;
     }
 
     /**
      * Converts given PartnerUniversity into a model representation
-     * This method is setting all the properties
      *
      * @param partnerUniversity PartnerUniversity to be converted
      * @return The converted model with set properties

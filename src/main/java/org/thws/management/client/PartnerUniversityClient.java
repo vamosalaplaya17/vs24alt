@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.thws.management.server.model.PartnerUniversity;
-import org.thws.management.server.model.PartnerUniversityModel;
 
 import java.net.URI;
 
@@ -106,5 +105,10 @@ public class PartnerUniversityClient {
     public ResponseEntity<Void> deletePartnerUniversity(int id) {
         URI uri = URI.create(BASE_URL + "/" + id);
         return restTemplate.exchange(uri, HttpMethod.DELETE, null, Void.class);
+    }
+
+    public void resetDatabase() {
+        String resetUrl = "http://localhost:8080/api/v1/reset-database";
+        restTemplate.postForEntity(resetUrl, null, Void.class);
     }
 }

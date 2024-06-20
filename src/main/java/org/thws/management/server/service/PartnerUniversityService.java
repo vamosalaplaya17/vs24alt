@@ -32,9 +32,13 @@ public class PartnerUniversityService {
      *
      * @param partnerUniversity PartnerUniversity to be created
      * @return The created PartnerUniversity
+     * @throws ResponseStatusException When PartnerUniversity with requested name already exists
      */
     public PartnerUniversity addNewPartnerUniversity(PartnerUniversity partnerUniversity) {
-        checkIfUniversityExists(partnerUniversity.getName());
+        if (partnerUniversityRepository.findPartnerUniversityByName(partnerUniversity.getName()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Partner university already exists");
+        }
+
         return partnerUniversityRepository.save(partnerUniversity);
     }
 
@@ -148,17 +152,5 @@ public class PartnerUniversityService {
      */
     public void deletePartnerUniversity(Long partnerUniversityId) {
         partnerUniversityRepository.deleteById(partnerUniversityId);
-    }
-
-    /**
-     * Checks if any PartnerUniversity with the given name already exists
-     *
-     * @param name Name to check with
-     */
-    public void checkIfUniversityExists(String name) {
-        if (partnerUniversityRepository.findPartnerUniversityByName(name).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "university with name " + name + " exists already");
-        }
     }
 }
