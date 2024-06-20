@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.thws.management.server.assembler.PartnerUniversityModelAssembler;
@@ -114,7 +115,7 @@ public class PartnerUniversityController {
      * @return Page containing PartnerUniversities with status code 200
      * Status code 404 if it finds nothing
      */
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedModel<PartnerUniversityModel>> getPartnerUniversities(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String country,
@@ -167,15 +168,15 @@ public class PartnerUniversityController {
         if (!sort.equalsIgnoreCase("asc")) {
             Link selfLinkAsc = linkTo(methodOn(PartnerUniversityController.class)
                     .getPartnerUniversities(name, country, departmentName, page, size, "asc"))
-                    .withRel("sort").withType("GET");
-            headers.add("sort ascending", selfLinkAsc.getHref());
+                    .withRel("sort ascending").withType("GET");
+            pagedModel.add(selfLinkAsc);
         }
 
         if (!sort.equalsIgnoreCase("desc")) {
             Link selfLinkDesc = linkTo(methodOn(PartnerUniversityController.class)
                     .getPartnerUniversities(name, country, departmentName, page, size, "desc"))
-                    .withRel("sort").withType("GET");
-            headers.add("sort descending", selfLinkDesc.getHref());
+                    .withRel("sort descending").withType("GET");
+            pagedModel.add(selfLinkDesc);
         }
 
         if (partnerUniversities.hasPrevious()) {

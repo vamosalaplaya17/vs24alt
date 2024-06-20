@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.thws.management.server.assembler.UniModuleModelAssembler;
@@ -118,7 +119,7 @@ public class UniModuleController {
      * @return Page of UniModule with status code 200
      * Status code 404 if no UniModule is found
      */
-    @GetMapping
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PagedModel<UniModuleModel>> getAllUniModules(
             @PathVariable Long partnerUniversityId,
             @RequestParam(defaultValue = DEFAULT_PAGE) int page,
@@ -164,15 +165,15 @@ public class UniModuleController {
         if (!sort.equalsIgnoreCase("asc")) {
             Link selfLinkAsc = linkTo(methodOn(UniModuleController.class)
                     .getAllUniModules(partnerUniversityId, page, size, "asc"))
-                    .withRel("sort").withType("GET");
-            headers.add("sort ascending", selfLinkAsc.getHref());
+                    .withRel("sort descending").withType("GET");
+            pagedModel.add(selfLinkAsc);
         }
 
         if (!sort.equalsIgnoreCase("desc")) {
             Link selfLinkDesc = linkTo(methodOn(UniModuleController.class)
                     .getAllUniModules(partnerUniversityId, page, size, "asc"))
-                    .withRel("sort").withType("GET");
-            headers.add("sort descending", selfLinkDesc.getHref());
+                    .withRel("sort ascending").withType("GET");
+            pagedModel.add(selfLinkDesc);
         }
 
         if (uniModules.hasPrevious()) {
