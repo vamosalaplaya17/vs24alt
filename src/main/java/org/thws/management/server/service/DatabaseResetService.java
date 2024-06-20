@@ -12,6 +12,9 @@ import org.thws.management.server.repository.UniModuleRepository;
 
 import java.util.List;
 
+/**
+ * Service class used for resetting the database to initial state
+ */
 @Service
 public class DatabaseResetService {
 
@@ -21,6 +24,7 @@ public class DatabaseResetService {
     private final UniModuleConfig uniModuleConfig;
     private final JdbcTemplate jdbcTemplate;
 
+    //constructor
     @Autowired
     public DatabaseResetService(PartnerUniversityRepository partnerUniversityRepository,
                                 UniModuleRepository uniModuleRepository,
@@ -34,35 +38,44 @@ public class DatabaseResetService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * Method used for resetting the database
+     *
+     * @throws Exception when something goes wrong
+     */
     @Transactional
     public void resetDatabase() throws Exception {
-        clearAssociations();
-        truncateTablesAndResetSequences();
+        deleteTables();
+        resetSequences();
         reinitializeData();
     }
 
-    private void clearAssociations() {
+    /**
+     * Deletes first the UniModule table, then the PartnerUniversity table
+     */
+    private void deleteTables() {
         jdbcTemplate.execute("DELETE FROM UNI_MODULE");
         jdbcTemplate.execute("DELETE FROM PARTNER_UNIVERSITY");
     }
 
-    private void truncateTablesAndResetSequences() {
-        // Reset sequences for H2 database
-        resetSequence("UNIMODULE_SEQUENCE");
-        resetSequence("PARTNER_UNIVERSITY_SEQUENCE");
+    /**
+     * Resets sequences, making IDs start from 1 again after resetting the database
+     */
+    private void resetSequences() {
+        jdbcTemplate.execute("ALTER SEQUENCE UNIMODULE_SEQUENCE RESTART WITH 1");
+        jdbcTemplate.execute("ALTER SEQUENCE PARTNER_UNIVERSITY_SEQUENCE RESTART WITH 1");
     }
 
-    private void resetSequence(String sequenceName) {
-        jdbcTemplate.execute("ALTER SEQUENCE " + sequenceName + " RESTART WITH 1");
-    }
-
+    /**
+     * Reinitializes database, using existing config classes
+     *
+     * @throws Exception when something goes wrong
+     */
     private void reinitializeData() throws Exception {
-        // Save partner universities first
         PartnerUniversity thws = partnerUniversityConfig.thws();
         PartnerUniversity otherUniversity = partnerUniversityConfig.otherUniversity();
         partnerUniversityRepository.saveAll(List.of(thws, otherUniversity));
 
-        // Reinitialize uni modules
         uniModuleConfig.uniModuleCommandLineRunner(partnerUniversityRepository, uniModuleRepository).run();
     }
 }

@@ -8,17 +8,26 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.thws.management.server.service.DatabaseResetService;
 
+/**
+ * Controller class for resetting the database
+ */
 @RestController
 @RequestMapping("/api/v1")
 public class DatabaseResetController {
 
     private final DatabaseResetService databaseResetService;
 
+    //constructor
     @Autowired
     public DatabaseResetController(DatabaseResetService databaseResetService) {
         this.databaseResetService = databaseResetService;
     }
 
+    /**
+     * Method to reset the database, executed by going to the URL /api/v1/reset-database
+     *
+     * @throws Exception when something goes wrong
+     */
     @PostMapping("/reset-database")
     @ResponseStatus(HttpStatus.OK)
     public void resetDatabase() throws Exception {

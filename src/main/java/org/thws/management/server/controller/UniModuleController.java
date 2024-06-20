@@ -14,6 +14,7 @@ import org.thws.management.server.assembler.UniModuleModelAssembler;
 import org.thws.management.server.model.PartnerUniversity;
 import org.thws.management.server.model.UniModule;
 import org.thws.management.server.model.UniModuleModel;
+import org.thws.management.server.repository.UniModuleRepository;
 import org.thws.management.server.service.PartnerUniversityService;
 import org.thws.management.server.service.UniModuleService;
 
@@ -35,6 +36,7 @@ public class UniModuleController {
     public static final String DEFAULT_PAGE = "0";
     public static final String DEFAULT_SIZE = "3";
     public static final String DEFAULT_SORT = "asc";
+    private final UniModuleRepository uniModuleRepository;
 
     /**
      * Constructs a new UniModuleController
@@ -46,10 +48,11 @@ public class UniModuleController {
     @Autowired
     public UniModuleController(UniModuleService uniModuleService,
                                UniModuleModelAssembler uniModuleModelAssembler,
-                               PartnerUniversityService partnerUniversityService) {
+                               PartnerUniversityService partnerUniversityService, UniModuleRepository uniModuleRepository) {
         this.uniModuleService = uniModuleService;
         this.uniModuleModelAssembler = uniModuleModelAssembler;
         this.partnerUniversityService = partnerUniversityService;
+        this.uniModuleRepository = uniModuleRepository;
     }
 
     /**
@@ -194,7 +197,6 @@ public class UniModuleController {
             @PathVariable("uniModuleId") Long uniModuleId,
             @RequestBody UniModule uniModule) {
         if (checkIfNull(partnerUniversityId, uniModuleId)) return ResponseEntity.notFound().build();
-        if (uniModule == null) return ResponseEntity.badRequest().build();
 
         HttpHeaders headers = getHeadersForSingleUniModule(partnerUniversityId, uniModuleId);
 

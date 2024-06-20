@@ -198,7 +198,7 @@ public class PartnerUniversityController {
     public ResponseEntity<PartnerUniversityModel> updatePartnerUniversity(
             @PathVariable("partnerUniversityId") Long partnerUniversityId,
             @RequestBody PartnerUniversity partnerUniversity) {
-        if (partnerUniversityService.getPartnerUniversityById(partnerUniversityId) == null || partnerUniversity == null) {
+        if (partnerUniversityService.getPartnerUniversityById(partnerUniversityId) == null) {
             return ResponseEntity.notFound().build();
         }
 

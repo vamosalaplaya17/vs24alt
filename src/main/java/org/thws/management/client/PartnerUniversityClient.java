@@ -11,6 +11,9 @@ import org.thws.management.server.model.PartnerUniversity;
 
 import java.net.URI;
 
+/**
+ * Class that utilizes RestTemplate to access the implemented backend API, methods used for tests
+ */
 @Component
 public class PartnerUniversityClient {
     private final String BASE_URL = "http://localhost:8080/api/v1/partner-universities";
@@ -21,6 +24,12 @@ public class PartnerUniversityClient {
         this.restTemplate = restTemplate;
     }
 
+    /**
+     * Method used for adding new PartnerUniversities
+     *
+     * @param partnerUniversity ID of PartnerUniversity to be added
+     * @return ResponseEntity containing information about newly created PartnerUniversity
+     */
     public ResponseEntity<PartnerUniversity> addNewPartnerUniversity(PartnerUniversity partnerUniversity) {
         URI uri = URI.create(BASE_URL);
         ResponseEntity<PartnerUniversity> response = restTemplate.postForEntity(uri, partnerUniversity, PartnerUniversity.class);
@@ -28,8 +37,14 @@ public class PartnerUniversityClient {
         return response;
     }
 
-    public ResponseEntity<PartnerUniversity> getSinglePartnerUniversity(int id) {
-        URI uri = URI.create(BASE_URL + "/" + id);
+    /**
+     * Method for fetching a single PartnerUniversity
+     *
+     * @param partnerUniversityId ID of PartnerUniversity to be fetched
+     * @return ResponseEntity containing information about fetched PartnerUniversity
+     */
+    public ResponseEntity<PartnerUniversity> getSinglePartnerUniversity(Long partnerUniversityId) {
+        URI uri = URI.create(BASE_URL + "/" + partnerUniversityId);
         ResponseEntity<PartnerUniversity> response = restTemplate.exchange(
                 uri,
                 HttpMethod.GET,
@@ -39,6 +54,11 @@ public class PartnerUniversityClient {
         return response;
     }
 
+    /**
+     * Method for fetching all PartnerUniversities
+     *
+     * @return ResponseEntity containing information about fetched PartnerUniversities
+     */
     public ResponseEntity<PagedModel<PartnerUniversity>> getAllPartnerUniversities() {
         URI uri = UriComponentsBuilder.fromUriString(BASE_URL)
                 .queryParam("page", 0)
@@ -56,6 +76,14 @@ public class PartnerUniversityClient {
         return response;
     }
 
+    /**
+     * Method used for fetching PartnerUniversities by filters
+     *
+     * @param name           Name of PartnerUniversity to be filtered by
+     * @param country        Country of PartnerUniversity to be filtered by
+     * @param departmentName Department Name of PartnerUniversity to be filtered by
+     * @return ResponseEntity containing information about fetched PartnerUniversities
+     */
     public ResponseEntity<PagedModel<PartnerUniversity>> getAllPartnerUniversitiesByFilters(String name, String country, String departmentName) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(BASE_URL)
                 .queryParam("page", 0)
@@ -84,6 +112,12 @@ public class PartnerUniversityClient {
         return response;
     }
 
+    /**
+     * Method for updating a PartnerUniversity
+     *
+     * @param partnerUniversity Data to be used for updating PartnerUniversity
+     * @return ResponseEntity containing information about updated PartnerUniversity
+     */
     public ResponseEntity<PartnerUniversity> updatePartnerUniversity(PartnerUniversity partnerUniversity) {
         URI uri = URI.create(BASE_URL + "/" + partnerUniversity.getId());
 
@@ -102,11 +136,20 @@ public class PartnerUniversityClient {
         return response;
     }
 
-    public ResponseEntity<Void> deletePartnerUniversity(int id) {
-        URI uri = URI.create(BASE_URL + "/" + id);
+    /**
+     * Method for deleting PartnerUniversity
+     *
+     * @param partnerUniversityId ID of PartnerUniversity to be deleted
+     * @return ResponseEntity containing information about deleted PartnerUniversity
+     */
+    public ResponseEntity<Void> deletePartnerUniversity(Long partnerUniversityId) {
+        URI uri = URI.create(BASE_URL + "/" + partnerUniversityId);
         return restTemplate.exchange(uri, HttpMethod.DELETE, null, Void.class);
     }
 
+    /**
+     * Method for resetting the database
+     */
     public void resetDatabase() {
         String resetUrl = "http://localhost:8080/api/v1/reset-database";
         restTemplate.postForEntity(resetUrl, null, Void.class);

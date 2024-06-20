@@ -1,5 +1,6 @@
 package org.thws.management;
 
+import org.junit.Assert;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,10 +17,12 @@ import org.thws.management.server.model.PartnerUniversity;
 
 import java.time.LocalDate;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
+/**
+ * Integration tests for the PartnerUniversity part of the backend
+ */
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class PartnerUniversityApplicationTests {
@@ -28,16 +31,22 @@ class PartnerUniversityApplicationTests {
 
     private PartnerUniversityClient partnerUniversityClient;
 
+    //sets up a new client before a test is run
     @BeforeEach
     void setUp() {
         partnerUniversityClient = new PartnerUniversityClient(testRestTemplate.getRestTemplate());
     }
 
+    //resets the database to initial state after a test is run
     @AfterEach
     void tearDown() {
         partnerUniversityClient.resetDatabase();
     }
 
+    /**
+     * Tests adding partner universities.
+     * Expected: status code 201 for creation, 409 when name already exists
+     */
     @Test
     void addPartnerUniversity() {
         PartnerUniversity partnerUniversity1 = new PartnerUniversity(
@@ -53,23 +62,38 @@ class PartnerUniversityApplicationTests {
         );
 
         assertEquals(HttpStatus.CREATED, partnerUniversityClient.addNewPartnerUniversity(partnerUniversity1).getStatusCode());
-
         assertEquals(HttpStatus.CONFLICT, partnerUniversityClient.addNewPartnerUniversity(partnerUniversity1).getStatusCode());
     }
 
+    /**
+     * Tests fetching a single partner university from the database.
+     * Expected: status code 200 when university exists, 404 when it doesn't exist
+     */
     @Test
     void testGetSinglePartnerUniversity() {
-        assertEquals(HttpStatus.OK, partnerUniversityClient.getSinglePartnerUniversity(1).getStatusCode());
-        assertEquals(HttpStatus.NOT_FOUND, partnerUniversityClient.getSinglePartnerUniversity(99).getStatusCode());
+        assertEquals(HttpStatus.OK, partnerUniversityClient.getSinglePartnerUniversity(1L).getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, partnerUniversityClient.getSinglePartnerUniversity(99L).getStatusCode());
     }
 
+    /**
+     * Tests fetching all universities from the database.
+     * Expected: status code 200 when fetching something, 404 when fetching nothing
+     */
     @Test
     void testGetAllPartnerUniversities() {
         ResponseEntity<PagedModel<PartnerUniversity>> response = partnerUniversityClient.getAllPartnerUniversities();
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertTrue(response.getBody().getContent().size() > 1);
+        Assert.assertEquals(2, response.getBody().getContent().size());
+
+        assertEquals(HttpStatus.NO_CONTENT, partnerUniversityClient.deletePartnerUniversity(1L).getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, partnerUniversityClient.deletePartnerUniversity(2L).getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, partnerUniversityClient.getAllPartnerUniversities().getStatusCode());
     }
 
+    /**
+     * Tests fetching all universities from the database, with different types of filters.
+     * Expected: status code 200 when fetching something, 404 when fetching nothing
+     */
     @Test
     void testGetPartnerUniversityByFilters() {
         PartnerUniversity filter1 = new PartnerUniversity(
@@ -173,34 +197,43 @@ class PartnerUniversityApplicationTests {
         assertEquals(HttpStatus.NOT_FOUND, response8.getStatusCode());
     }
 
+    /**
+     * Tests updating values of partner universities.
+     * Expected: status code 200 when successfully updating, 404 works correctly in e.g. Postman, hard to reproduce here
+     */
     @Test
     void updatePartnerUniversity() {
-        ResponseEntity<PartnerUniversity> response1 = partnerUniversityClient.getSinglePartnerUniversity(2);
+        //fetches university
+        ResponseEntity<PartnerUniversity> response1 = partnerUniversityClient.getSinglePartnerUniversity(2L);
         assertEquals(HttpStatus.OK, response1.getStatusCode());
 
+        //saves its name in a String
         PartnerUniversity oldModel = response1.getBody();
         String oldName = oldModel.getName();
 
+        //sets a new name and tries to update
         oldModel.setName("new name");
-        partnerUniversityClient.updatePartnerUniversity(oldModel);
-        ResponseEntity<PartnerUniversity> response2 = partnerUniversityClient.getSinglePartnerUniversity(2);
+        assertEquals(HttpStatus.OK, partnerUniversityClient.updatePartnerUniversity(oldModel).getStatusCode());
+
+        //fetches same university again
+        ResponseEntity<PartnerUniversity> response2 = partnerUniversityClient.getSinglePartnerUniversity(2L);
         assertEquals(HttpStatus.OK, response2.getStatusCode());
 
+        //saves its name again
         PartnerUniversity updatedModel = response2.getBody();
         String updatedName = updatedModel.getName();
 
+        //compares if names are not equal
         assertNotEquals(oldName, updatedName);
-
-        ResponseEntity<PartnerUniversity> response3 = partnerUniversityClient.getSinglePartnerUniversity(2);
-        PartnerUniversity deletedModel = response3.getBody();
-        deletedModel.setName("deleted name");
-        partnerUniversityClient.deletePartnerUniversity(2);
-        assertEquals(HttpStatus.NOT_FOUND, partnerUniversityClient.updatePartnerUniversity(deletedModel).getStatusCode());
     }
 
+    /**
+     * Tests deleting partner universities.
+     * Expected: status code 204 upon successful deletion, 404 when university is not found
+     */
     @Test
     void deletePartnerUniversity() {
-        assertEquals(HttpStatus.NO_CONTENT, partnerUniversityClient.deletePartnerUniversity(1).getStatusCode());
-        assertEquals(HttpStatus.NOT_FOUND, partnerUniversityClient.deletePartnerUniversity(1).getStatusCode());
+        assertEquals(HttpStatus.NO_CONTENT, partnerUniversityClient.deletePartnerUniversity(1L).getStatusCode());
+        assertEquals(HttpStatus.NOT_FOUND, partnerUniversityClient.deletePartnerUniversity(1L).getStatusCode());
     }
 }
