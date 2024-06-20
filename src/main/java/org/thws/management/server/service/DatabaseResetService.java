@@ -52,6 +52,7 @@ public class DatabaseResetService {
 
     /**
      * Deletes first the UniModule table, then the PartnerUniversity table
+     * IGNORE ERRORS
      */
     private void deleteTables() {
         jdbcTemplate.execute("DELETE FROM UNI_MODULE");
@@ -60,6 +61,7 @@ public class DatabaseResetService {
 
     /**
      * Resets sequences, making IDs start from 1 again after resetting the database
+     * IGNORE ERRORS
      */
     private void resetSequences() {
         jdbcTemplate.execute("ALTER SEQUENCE UNIMODULE_SEQUENCE RESTART WITH 1");
