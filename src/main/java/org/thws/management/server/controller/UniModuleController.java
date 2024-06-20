@@ -163,14 +163,18 @@ public class UniModuleController {
                 .withRel("create").withType("POST");
         headers.add("create", postLink.getHref());
 
-        if (sort.equals("asc")) {
-            Link selfLinkDesc = linkTo(methodOn(UniModuleController.class).getAllUniModules(partnerUniversityId, page, size, "desc"))
+        if (!sort.equalsIgnoreCase("asc")) {
+            Link selfLinkAsc = linkTo(methodOn(UniModuleController.class)
+                    .getAllUniModules(partnerUniversityId, page, size, "asc"))
                     .withRel("sort").withType("GET");
-            headers.add("descending order", selfLinkDesc.getHref());
-        } else {
-            Link selfLinkAsc = linkTo(methodOn(UniModuleController.class).getAllUniModules(partnerUniversityId, page, size, "asc"))
+            pagedModel.add(selfLinkAsc);
+        }
+
+        if (!sort.equalsIgnoreCase("desc")) {
+            Link selfLinkDesc = linkTo(methodOn(UniModuleController.class)
+                    .getAllUniModules(partnerUniversityId, page, size, "asc"))
                     .withRel("sort").withType("GET");
-            headers.add("ascending order", selfLinkAsc.getHref());
+            pagedModel.add(selfLinkDesc);
         }
 
         if (uniModules.hasPrevious()) {

@@ -110,7 +110,7 @@ public class PartnerUniversityController {
      * @param country        Country of PartnerUniversity
      * @param departmentName Department name of PartnerUniversity
      * @param page           Page number to retrieve, default is 0
-     * @param size           Number of PartnerUniversities to show per page, standard is 3 (to make testing easier)
+     * @param size           Number of PartnerUniversities to show per page, standard is 2 (to make testing easier)
      * @return Page containing PartnerUniversities with status code 200
      * Status code 404 if it finds nothing
      */
@@ -164,14 +164,18 @@ public class PartnerUniversityController {
                 .withRel("create").withType("POST");
         headers.add("create", postLink.getHref());
 
-        if (sort.equals("asc")) {
-            Link selfLinkDesc = linkTo(methodOn(PartnerUniversityController.class).getPartnerUniversities(name, country, departmentName, page, size, "desc"))
+        if (!sort.equalsIgnoreCase("asc")) {
+            Link selfLinkAsc = linkTo(methodOn(PartnerUniversityController.class)
+                    .getPartnerUniversities(name, country, departmentName, page, size, "asc"))
                     .withRel("sort").withType("GET");
-            headers.add("descending order", selfLinkDesc.getHref());
-        } else {
-            Link selfLinkAsc = linkTo(methodOn(PartnerUniversityController.class).getPartnerUniversities(name, country, departmentName, page, size, "asc"))
+            pagedModel.add(selfLinkAsc);
+        }
+
+        if (!sort.equalsIgnoreCase("desc")) {
+            Link selfLinkDesc = linkTo(methodOn(PartnerUniversityController.class)
+                    .getPartnerUniversities(name, country, departmentName, page, size, "desc"))
                     .withRel("sort").withType("GET");
-            headers.add("ascending order", selfLinkAsc.getHref());
+            pagedModel.add(selfLinkDesc);
         }
 
         if (partnerUniversities.hasPrevious()) {
