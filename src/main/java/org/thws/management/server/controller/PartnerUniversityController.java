@@ -168,14 +168,14 @@ public class PartnerUniversityController {
             Link selfLinkAsc = linkTo(methodOn(PartnerUniversityController.class)
                     .getPartnerUniversities(name, country, departmentName, page, size, "asc"))
                     .withRel("sort").withType("GET");
-            pagedModel.add(selfLinkAsc);
+            headers.add("sort ascending", selfLinkAsc.getHref());
         }
 
         if (!sort.equalsIgnoreCase("desc")) {
             Link selfLinkDesc = linkTo(methodOn(PartnerUniversityController.class)
                     .getPartnerUniversities(name, country, departmentName, page, size, "desc"))
                     .withRel("sort").withType("GET");
-            pagedModel.add(selfLinkDesc);
+            headers.add("sort descending", selfLinkDesc.getHref());
         }
 
         if (partnerUniversities.hasPrevious()) {

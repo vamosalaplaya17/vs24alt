@@ -36,7 +36,6 @@ public class UniModuleController {
     public static final String DEFAULT_PAGE = "0";
     public static final String DEFAULT_SIZE = "3";
     public static final String DEFAULT_SORT = "asc";
-    private final UniModuleRepository uniModuleRepository;
 
     /**
      * Constructs a new UniModuleController
@@ -48,11 +47,10 @@ public class UniModuleController {
     @Autowired
     public UniModuleController(UniModuleService uniModuleService,
                                UniModuleModelAssembler uniModuleModelAssembler,
-                               PartnerUniversityService partnerUniversityService, UniModuleRepository uniModuleRepository) {
+                               PartnerUniversityService partnerUniversityService) {
         this.uniModuleService = uniModuleService;
         this.uniModuleModelAssembler = uniModuleModelAssembler;
         this.partnerUniversityService = partnerUniversityService;
-        this.uniModuleRepository = uniModuleRepository;
     }
 
     /**
@@ -167,14 +165,14 @@ public class UniModuleController {
             Link selfLinkAsc = linkTo(methodOn(UniModuleController.class)
                     .getAllUniModules(partnerUniversityId, page, size, "asc"))
                     .withRel("sort").withType("GET");
-            pagedModel.add(selfLinkAsc);
+            headers.add("sort ascending", selfLinkAsc.getHref());
         }
 
         if (!sort.equalsIgnoreCase("desc")) {
             Link selfLinkDesc = linkTo(methodOn(UniModuleController.class)
                     .getAllUniModules(partnerUniversityId, page, size, "asc"))
                     .withRel("sort").withType("GET");
-            pagedModel.add(selfLinkDesc);
+            headers.add("sort descending", selfLinkDesc.getHref());
         }
 
         if (uniModules.hasPrevious()) {
