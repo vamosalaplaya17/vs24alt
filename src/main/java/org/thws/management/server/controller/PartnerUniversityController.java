@@ -160,11 +160,6 @@ public class PartnerUniversityController {
 
         HttpHeaders headers = new HttpHeaders();
 
-        Link selfLinkFilters = linkTo(methodOn(PartnerUniversityController.class)
-                .getPartnerUniversities(name, country, departmentName, page, size, sort))
-                .withSelfRel().withType("GET");
-        headers.add("filter", selfLinkFilters.getHref());
-
         Link postLink = linkTo(methodOn(PartnerUniversityController.class).addNewPartnerUniversity(null))
                 .withSelfRel().withType("POST");
         headers.add("create", postLink.getHref());
